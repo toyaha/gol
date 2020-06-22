@@ -562,7 +562,7 @@ func TestClient_Exec(t *testing.T) {
 }
 
 func TestClient_Meta(t *testing.T) {
-	t.Run("meta", func(t *testing.T) {
+	t.Run("meta item", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -574,22 +574,256 @@ func TestClient_Meta(t *testing.T) {
 
 		table := test.Item{}
 		db.AddMeta(&table)
-		query := db.NewQuery()
 
 		{
-			target := query.Client.Meta.GetBaseTable(&table)
-			check := "item"
+			target := db.GetBaseSchema(&table.Id)
+			check := ``
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
-		tableTag := test.Tag{}
-		query.AddMeta(&tableTag)
+		{
+			target := db.GetBaseTable(&table.Id)
+			check := `item`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
 
 		{
-			target := db.GetBaseTable(&tableTag)
-			check := "_"
+			target := db.GetBaseAs(&table.Id)
+			check := ``
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetBaseColumn(&table.Id)
+			check := `id`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetSchema(&table.Id)
+			check := ``
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetTable(&table.Id)
+			check := `"item"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetAs(&table.Id)
+			check := ``
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetColumn(&table.Id)
+			check := `"id"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetTableAs(&table.Id)
+			check := `"item"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetSchemaTable(&table.Id)
+			check := `"item"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetSchemaTableColumn(&table.Id)
+			check := `"item"."id"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetSchemaTableAs(&table.Id)
+			check := `"item"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetSchemaTableAsColumn(&table.Id)
+			check := `"item"."id"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetTableAs(&table.Id)
+			check := `"item"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetTableAsColumn(&table.Id)
+			check := `"item"."id"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+	})
+
+	t.Run("meta tag", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Tag{}
+		db.AddMeta(&table)
+
+		{
+			target := db.GetBaseSchema(&table.Id)
+			check := `PUBLIC`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetBaseTable(&table.Id)
+			check := `TAG`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetBaseAs(&table.Id)
+			check := ``
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetBaseColumn(&table.Id)
+			check := `ID`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetSchema(&table.Id)
+			check := `"PUBLIC"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetTable(&table.Id)
+			check := `"TAG"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetAs(&table.Id)
+			check := ``
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetColumn(&table.Id)
+			check := `"ID"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetTableAs(&table.Id)
+			check := `"TAG"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetSchemaTable(&table.Id)
+			check := `"PUBLIC"."TAG"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetSchemaTableColumn(&table.Id)
+			check := `"PUBLIC"."TAG"."ID"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetSchemaTableAs(&table.Id)
+			check := `"PUBLIC"."TAG"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetSchemaTableAsColumn(&table.Id)
+			check := `"PUBLIC"."TAG"."ID"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetTableAs(&table.Id)
+			check := `"TAG"`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+
+		{
+			target := db.GetTableAsColumn(&table.Id)
+			check := `"TAG"."ID"`
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}

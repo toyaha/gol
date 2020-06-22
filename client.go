@@ -159,15 +159,15 @@ func (rec *Client) GetColumn(any interface{}) string {
 }
 
 func (rec *Client) GetTableAs(any interface{}) string {
-	return rec.Meta.GetTable(any)
+	return rec.Meta.GetTableAs(any)
 }
 
 func (rec *Client) GetSchemaTable(any interface{}) string {
-	return rec.Meta.GetSchema(any)
+	return rec.Meta.GetSchemaTable(any)
 }
 
 func (rec *Client) GetSchemaTableColumn(any interface{}) string {
-	return rec.Meta.GetSchemaTable(any)
+	return rec.Meta.GetSchemaTableColumn(any)
 }
 
 func (rec *Client) GetSchemaTableAs(any interface{}) string {
