@@ -9,21 +9,21 @@ import (
 const (
 	DbMssqlHost     = "localhost"
 	DbMssqlPort     = "1433"
-	DbMssqlUser     = "sa"
+	DbMssqlUser     = "user"
 	DbMssqlPass     = "Password!"
-	DbMssqlDatabase = "master"
+	DbMssqlDatabase = "db"
 
 	DbMysqlHost     = "localhost"
 	DbMysqlPort     = "3306"
 	DbMysqlUser     = "user"
 	DbMysqlPass     = "pass"
-	DbMysqlDatabase = "database"
+	DbMysqlDatabase = "db"
 
 	DbPostgresqlHost     = "localhost"
 	DbPostgresqlPort     = "5432"
 	DbPostgresqlUser     = "user"
 	DbPostgresqlPass     = "pass"
-	DbPostgresqlDatabase = "database"
+	DbPostgresqlDatabase = "db"
 
 	SchemaPublic     = "public"
 	SchemaTest       = "test"
