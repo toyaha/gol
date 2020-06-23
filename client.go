@@ -270,14 +270,6 @@ func (rec *Client) Query(query string, valueList ...interface{}) (*sql.Rows, err
 		query = ChangeQueryForPostgresql(query)
 	}
 
-	if rec.Config.DatabaseType == DatabaseTypeMssql {
-		var valList []interface{}
-		for key, val := range valueList {
-			valList = append(valList, sql.NamedArg{Name: fmt.Sprintf("v%v", key+1), Value: val})
-		}
-		valueList = valList
-	}
-
 	if rec.Config.Log {
 		fmt.Printf("query: %v\n", query)
 		fmt.Printf("value: %v\n", valueList)
