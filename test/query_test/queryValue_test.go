@@ -2072,7 +2072,7 @@ func TestQueryValue_BuildSet(t *testing.T) {
 func TestQueryValue_BuildSelectUseAs(t *testing.T) {
 	tableItem := test.Item{}
 
-	fn := func(t *testing.T, tableList [][]interface{}, selectList [][]interface{}, check string) {
+	fn := func(t *testing.T, tableList [][]interface{}, selectList [][]interface{}, checkList []string) {
 		queryValue := gol.NewQueryValue(nil)
 
 		for _, val := range tableList {
@@ -2083,7 +2083,7 @@ func TestQueryValue_BuildSelectUseAs(t *testing.T) {
 			queryValue.AddSelect(val[0].(int), val[1:]...)
 		}
 
-		query, err := queryValue.BuildSelectUseAs()
+		query, valueList, err := queryValue.BuildSelectUseAs()
 		if err != nil {
 			t.Error(err)
 			return
@@ -2091,6 +2091,15 @@ func TestQueryValue_BuildSelectUseAs(t *testing.T) {
 
 		{
 			target := query
+			check := checkList[0]
+			if target != check {
+				t.Error("\ntarget:", target, "\ncheck :", check)
+			}
+		}
+
+		{
+			target := fmt.Sprintf("%+v", valueList)
+			check := checkList[1]
 			if target != check {
 				t.Error("\ntarget:", target, "\ncheck :", check)
 			}
@@ -2106,8 +2115,11 @@ func TestQueryValue_BuildSelectUseAs(t *testing.T) {
 			{gol.QueryModeDefault, &tableItem.Name},
 			{gol.QueryModeDefault, &tableItem.Name},
 		}
-		check := `SELECT count("item"."id"), "item"."name", "item"."name"`
-		fn(t, tableList, selectList, check)
+		checkList := []string{
+			`SELECT count("item"."id"), "item"."name", "item"."name"`,
+			"[]",
+		}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("table as", func(t *testing.T) {
@@ -2119,8 +2131,11 @@ func TestQueryValue_BuildSelectUseAs(t *testing.T) {
 			{gol.QueryModeDefault, &tableItem.Name},
 			{gol.QueryModeDefault, &tableItem.Name},
 		}
-		check := `SELECT count("t1"."id"), "t1"."name", "t1"."name"`
-		fn(t, tableList, selectList, check)
+		checkList := []string{
+			`SELECT count("t1"."id"), "t1"."name", "t1"."name"`,
+			"[]",
+		}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("schema table", func(t *testing.T) {
@@ -2132,8 +2147,11 @@ func TestQueryValue_BuildSelectUseAs(t *testing.T) {
 			{gol.QueryModeDefault, &tableItem.Name},
 			{gol.QueryModeDefault, &tableItem.Name},
 		}
-		check := `SELECT count("s1"."item"."id"), "s1"."item"."name", "s1"."item"."name"`
-		fn(t, tableList, selectList, check)
+		checkList := []string{
+			`SELECT count("s1"."item"."id"), "s1"."item"."name", "s1"."item"."name"`,
+			"[]",
+		}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("schema table as", func(t *testing.T) {
@@ -2145,8 +2163,11 @@ func TestQueryValue_BuildSelectUseAs(t *testing.T) {
 			{gol.QueryModeDefault, &tableItem.Name},
 			{gol.QueryModeDefault, &tableItem.Name},
 		}
-		check := `SELECT count("t1"."id"), "t1"."name", "t1"."name"`
-		fn(t, tableList, selectList, check)
+		checkList := []string{
+			`SELECT count("t1"."id"), "t1"."name", "t1"."name"`,
+			"[]",
+		}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("all table", func(t *testing.T) {
@@ -2156,8 +2177,11 @@ func TestQueryValue_BuildSelectUseAs(t *testing.T) {
 		selectList := [][]interface{}{
 			{gol.QueryModeAll, &tableItem},
 		}
-		check := `SELECT "item".*`
-		fn(t, tableList, selectList, check)
+		checkList := []string{
+			`SELECT "item".*`,
+			"[]",
+		}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("all table as", func(t *testing.T) {
@@ -2167,8 +2191,11 @@ func TestQueryValue_BuildSelectUseAs(t *testing.T) {
 		selectList := [][]interface{}{
 			{gol.QueryModeAll, &tableItem},
 		}
-		check := `SELECT "t1".*`
-		fn(t, tableList, selectList, check)
+		checkList := []string{
+			`SELECT "t1".*`,
+			"[]",
+		}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("all schema table", func(t *testing.T) {
@@ -2178,8 +2205,11 @@ func TestQueryValue_BuildSelectUseAs(t *testing.T) {
 		selectList := [][]interface{}{
 			{gol.QueryModeAll, &tableItem},
 		}
-		check := `SELECT "s1"."item".*`
-		fn(t, tableList, selectList, check)
+		checkList := []string{
+			`SELECT "s1"."item".*`,
+			"[]",
+		}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("all schema table as", func(t *testing.T) {
@@ -2189,8 +2219,26 @@ func TestQueryValue_BuildSelectUseAs(t *testing.T) {
 		selectList := [][]interface{}{
 			{gol.QueryModeAll, &tableItem},
 		}
-		check := `SELECT "t1".*`
-		fn(t, tableList, selectList, check)
+		checkList := []string{
+			`SELECT "t1".*`,
+			"[]",
+		}
+		fn(t, tableList, selectList, checkList)
+	})
+
+	t.Run("table query", func(t *testing.T) {
+		tableList := [][]interface{}{
+			{"", &tableItem, ""},
+		}
+		selectList := [][]interface{}{
+			{gol.QueryModeDefault, "(select a from b where c = ?)", []interface{}{1}},
+			{gol.QueryModeDefault, "(select d from e where f = ?)", []interface{}{2}},
+		}
+		checkList := []string{
+			`SELECT (select a from b where c = ?), (select d from e where f = ?)`,
+			"[1 2]",
+		}
+		fn(t, tableList, selectList, checkList)
 	})
 }
 
@@ -4001,7 +4049,7 @@ func TestQuerySet_Build(t *testing.T) {
 func TestQuerySelect_BuildUseAs(t *testing.T) {
 	tableItem := test.Item{}
 
-	fn := func(t *testing.T, tableList [][]interface{}, selectList []interface{}, check string) {
+	fn := func(t *testing.T, tableList [][]interface{}, selectList []interface{}, checkList []string) {
 		meta := gol.NewMeta(nil)
 
 		for _, val := range tableList {
@@ -4014,7 +4062,7 @@ func TestQuerySelect_BuildUseAs(t *testing.T) {
 		data := &gol.QuerySelect{}
 		data.Set(selectList[0].(int), selectList[1:]...)
 
-		query, err := data.BuildUseAs(meta)
+		query, valueList, err := data.BuildUseAs(meta)
 		if err != nil {
 			t.Error(err)
 			return
@@ -4022,6 +4070,15 @@ func TestQuerySelect_BuildUseAs(t *testing.T) {
 
 		{
 			target := query
+			check := checkList[0]
+			if target != check {
+				t.Error("\ntarget:", target, "\ncheck :", check)
+			}
+		}
+
+		{
+			target := fmt.Sprintf("%+v", valueList)
+			check := checkList[1]
 			if target != check {
 				t.Error("\ntarget:", target, "\ncheck :", check)
 			}
@@ -4033,8 +4090,8 @@ func TestQuerySelect_BuildUseAs(t *testing.T) {
 			{"", &tableItem, ""},
 		}
 		selectList := []interface{}{gol.QueryModeDefault, "count(", &tableItem.Id, ")"}
-		check := `count("item"."id")`
-		fn(t, tableList, selectList, check)
+		checkList := []string{`count("item"."id")`, "[]"}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("table as", func(t *testing.T) {
@@ -4042,8 +4099,8 @@ func TestQuerySelect_BuildUseAs(t *testing.T) {
 			{"", &tableItem, "t1"},
 		}
 		selectList := []interface{}{gol.QueryModeDefault, "count(", &tableItem.Id, ")"}
-		check := `count("t1"."id")`
-		fn(t, tableList, selectList, check)
+		checkList := []string{`count("t1"."id")`, "[]"}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("schema table", func(t *testing.T) {
@@ -4051,8 +4108,8 @@ func TestQuerySelect_BuildUseAs(t *testing.T) {
 			{"s1", &tableItem, ""},
 		}
 		selectList := []interface{}{gol.QueryModeDefault, "count(", &tableItem.Id, ")"}
-		check := `count("s1"."item"."id")`
-		fn(t, tableList, selectList, check)
+		checkList := []string{`count("s1"."item"."id")`, "[]"}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("schema table as", func(t *testing.T) {
@@ -4060,8 +4117,8 @@ func TestQuerySelect_BuildUseAs(t *testing.T) {
 			{"s1", &tableItem, "t1"},
 		}
 		selectList := []interface{}{gol.QueryModeDefault, "count(", &tableItem.Id, ")"}
-		check := `count("t1"."id")`
-		fn(t, tableList, selectList, check)
+		checkList := []string{`count("t1"."id")`, "[]"}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("all table", func(t *testing.T) {
@@ -4069,8 +4126,8 @@ func TestQuerySelect_BuildUseAs(t *testing.T) {
 			{"", &tableItem, ""},
 		}
 		selectList := []interface{}{gol.QueryModeAll, &tableItem}
-		check := `"item".*`
-		fn(t, tableList, selectList, check)
+		checkList := []string{`"item".*`, "[]"}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("all table as", func(t *testing.T) {
@@ -4078,8 +4135,8 @@ func TestQuerySelect_BuildUseAs(t *testing.T) {
 			{"", &tableItem, "t1"},
 		}
 		selectList := []interface{}{gol.QueryModeAll, &tableItem}
-		check := `"t1".*`
-		fn(t, tableList, selectList, check)
+		checkList := []string{`"t1".*`, "[]"}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("all schema table", func(t *testing.T) {
@@ -4087,8 +4144,8 @@ func TestQuerySelect_BuildUseAs(t *testing.T) {
 			{"s1", &tableItem, ""},
 		}
 		selectList := []interface{}{gol.QueryModeAll, &tableItem}
-		check := `"s1"."item".*`
-		fn(t, tableList, selectList, check)
+		checkList := []string{`"s1"."item".*`, "[]"}
+		fn(t, tableList, selectList, checkList)
 	})
 
 	t.Run("all schema table as", func(t *testing.T) {
@@ -4096,8 +4153,17 @@ func TestQuerySelect_BuildUseAs(t *testing.T) {
 			{"s1", &tableItem, "t1"},
 		}
 		selectList := []interface{}{gol.QueryModeAll, &tableItem}
-		check := `"t1".*`
-		fn(t, tableList, selectList, check)
+		checkList := []string{`"t1".*`, "[]"}
+		fn(t, tableList, selectList, checkList)
+	})
+
+	t.Run("table query", func(t *testing.T) {
+		tableList := [][]interface{}{
+			{"", &tableItem, ""},
+		}
+		selectList := []interface{}{gol.QueryModeDefault, "(select a from b where c = ?)", []interface{}{1}}
+		checkList := []string{`(select a from b where c = ?)`, "[1]"}
+		fn(t, tableList, selectList, checkList)
 	})
 }
 

@@ -182,7 +182,7 @@ func (rec *QueryValue) GetSelectQuery() (string, []interface{}, error) {
 	var valueList []interface{}
 
 	{
-		str, err := rec.BuildSelectUseAs()
+		str, valList, err := rec.BuildSelectUseAs()
 		if err != nil {
 			return "", nil, err
 		}
@@ -190,6 +190,7 @@ func (rec *QueryValue) GetSelectQuery() (string, []interface{}, error) {
 			return "", nil, errors.New("select not exist")
 		}
 		query = str
+		valueList = append(valueList, valList...)
 	}
 
 	{
@@ -509,23 +510,25 @@ func (rec *QueryValue) BuildSet() (string, []interface{}, error) {
 	return query, valueList, nil
 }
 
-func (rec *QueryValue) BuildSelectUseAs() (string, error) {
+func (rec *QueryValue) BuildSelectUseAs() (string, []interface{}, error) {
 	var query string
+	var valueList []interface{}
 	{
 		var strList []string
 		for _, val := range rec.SelectList {
-			str, err := val.BuildUseAs(rec.Meta)
+			str, valList, err := val.BuildUseAs(rec.Meta)
 			if err != nil {
-				return "", err
+				return "", nil, err
 			}
 			strList = append(strList, str)
+			valueList = append(valueList, valList...)
 		}
 		if len(strList) > 0 {
 			query = strings.Join(strList, ", ")
 			query = fmt.Sprintf("SELECT %v", query)
 		}
 	}
-	return query, nil
+	return query, valueList, nil
 }
 
 func (rec *QueryValue) BuildWhere() (string, []interface{}, error) {
@@ -949,38 +952,45 @@ type QuerySelect struct {
 	ValueList []interface{}
 }
 
-func (rec *QuerySelect) BuildUseAs(meta *Meta) (string, error) {
+func (rec *QuerySelect) BuildUseAs(meta *Meta) (string, []interface{}, error) {
 	var query string
+	var valueList []interface{}
 
 	switch rec.Mode {
 	case QueryModeDefault:
 		if len(rec.ValueList) < 1 {
-			return query, errors.New("select length must be greater than 1")
+			return query, valueList, errors.New("select length must be greater than 1")
 		}
+
 		var strList []string
 		for _, val := range rec.ValueList {
-			data := meta.Get(val)
-			if data != nil {
-				strList = append(strList, data.SchemaTableAsColumn)
+			if fmt.Sprintf("%T", val) == "[]interface {}" {
+				for _, value := range val.([]interface{}) {
+					valueList = append(valueList, value)
+				}
 			} else {
-				strList = append(strList, fmt.Sprintf("%v", val))
+				if data := meta.Get(val); data != nil {
+					strList = append(strList, data.SchemaTableAsColumn)
+				} else {
+					strList = append(strList, fmt.Sprintf("%v", val))
+				}
 			}
 		}
 		query = strings.Join(strList, "")
 	case QueryModeAll:
 		if len(rec.ValueList) != 1 {
-			return query, errors.New("select length should be 1")
+			return query, valueList, errors.New("select length should be 1")
 		}
 		data := meta.Get(rec.ValueList[0])
 		if data == nil {
-			return query, errors.New("select not exist")
+			return query, valueList, errors.New("select not exist")
 		}
 		query = fmt.Sprintf("%s.*", data.SchemaTableAs)
 	default:
-		return query, errors.New("select mode not exist")
+		return query, valueList, errors.New("select mode not exist")
 	}
 
-	return query, nil
+	return query, valueList, nil
 }
 
 func (rec *QuerySelect) Set(mode int, valueList ...interface{}) {
