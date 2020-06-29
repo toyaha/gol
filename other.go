@@ -19,8 +19,14 @@ func ChangeQueryForMssql(query string) string {
 
 func ChangeValueListForMssql(valueList ...interface{}) []interface{} {
 	var valList []interface{}
-	for key, val := range valueList {
-		valList = append(valList, sql.NamedArg{Name: fmt.Sprintf("v%v", key+1), Value: val})
+	count := 1
+	for _, val := range valueList {
+		if fmt.Sprintf("%T", val) != "sql.NamedArg" {
+			valList = append(valList, sql.NamedArg{Name: fmt.Sprintf("v%v", count), Value: val})
+			count++
+		} else {
+			valList = append(valList, val)
+		}
 	}
 	return valList
 }

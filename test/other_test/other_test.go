@@ -34,11 +34,11 @@ func TestChangeValueListForMssql(t *testing.T) {
 	}
 
 	t.Run("base", func(t *testing.T) {
-		dataList := []interface{}{1, "a", true}
+		dataList := []interface{}{1, sql.NamedArg{Name: "a", Value: "b"}, true}
 		checkList := []interface{}{
 			sql.NamedArg{Name: "v1", Value: 1},
-			sql.NamedArg{Name: "v2", Value: "a"},
-			sql.NamedArg{Name: "v3", Value: true},
+			sql.NamedArg{Name: "a", Value: "b"},
+			sql.NamedArg{Name: "v2", Value: true},
 		}
 		fn(t, dataList, checkList)
 	})
