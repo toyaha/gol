@@ -229,13 +229,13 @@ func NewMetaValue(schema string, table string, as string, column string, dbType 
 	format := func() string {
 		switch dbType {
 		case DatabaseTypeMssql:
-			return "\"%v\""
+			return "[%v]"
 		case DatabaseTypeMysql:
-			return "%v"
+			return "`%v`"
 		case DatabaseTypePostgresql:
 			return "\"%v\""
 		}
-		return "\"%v\""
+		return "%v"
 	}()
 
 	if data.BaseSchema != "" {
