@@ -17,8 +17,8 @@ func TestChangeQueryForMssql(t *testing.T) {
 	}
 
 	t.Run("base", func(t *testing.T) {
-		query := "abcABC123-^\\@[;:],./!\"#$%&'()=~|`{+*}<>?_???"
-		check := "abcABC123-^\\@[;:],./!\"#$%&'()=~|`{+*}<>@v1_@v2@v3@v4"
+		var query = "abcABC123-^\\@[;:],./!\"#$%&'()=~|`{+*}<>?_???"
+		var check = "abcABC123-^\\@[;:],./!\"#$%&'()=~|`{+*}<>@v1_@v2@v3@v4"
 		fn(t, query, check)
 	})
 }
@@ -34,8 +34,8 @@ func TestChangeValueListForMssql(t *testing.T) {
 	}
 
 	t.Run("base", func(t *testing.T) {
-		dataList := []interface{}{1, sql.NamedArg{Name: "a", Value: "b"}, true}
-		checkList := []interface{}{
+		var dataList = []interface{}{1, sql.NamedArg{Name: "a", Value: "b"}, true}
+		var checkList = []interface{}{
 			sql.NamedArg{Name: "v1", Value: 1},
 			sql.NamedArg{Name: "a", Value: "b"},
 			sql.NamedArg{Name: "v2", Value: true},
@@ -53,8 +53,8 @@ func TestChangeQueryForPostgresql(t *testing.T) {
 	}
 
 	t.Run("base", func(t *testing.T) {
-		query := "abcABC123-^\\@[;:],./!\"#$%&'()=~|`{+*}<>?_???"
-		check := "abcABC123-^\\@[;:],./!\"#$%&'()=~|`{+*}<>$1_$2$3$4"
+		var query = "abcABC123-^\\@[;:],./!\"#$%&'()=~|`{+*}<>?_???"
+		var check = "abcABC123-^\\@[;:],./!\"#$%&'()=~|`{+*}<>$1_$2$3$4"
 		fn(t, query, check)
 	})
 }

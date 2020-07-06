@@ -84,18 +84,19 @@ import (
   "github.com/toyaha/gol"
 )
 
-// user
-type User struct {
-    Id   int            `column:"id" json:"id"`
-    Name string         `column:"name" json:"name"`
-    Mail gol.NullString `column:"mail" json:"mail"`
+// item
+type Item struct {
+    Id  int    `column:"id" json:"id"`
+    Num int    `column:"num" json:"num"`
+    Str string `column:"str" json:"str"`
 }
 
-// user_detail
+// item_detail
 type Detail struct {
-    Id     int    `schema:"public" table:"user_detail" column:"id" json:"id"`
-    UserId string `schema:"public" table:"user_detail" column:"user_id" json:"user_id"`
-    Sample string `schema:"public" table:"user_detail" column:"sample" json:"sample"`
+    Id     int    `schema:"public" table:"item_detail" column:"id" json:"id"`
+    ItemId int    `schema:"public" table:"item_detail" column:"item_id" json:"item_id"`
+    Num    int    `schema:"public" table:"item_detail" column:"num" json:"num"`
+    Str    string `schema:"public" table:"item_detail" column:"str" json:"str"`
 }
 
 func New() (*gol.Client, error) {
@@ -108,11 +109,12 @@ func New() (*gol.Client, error) {
     user := "username"
     pass := "password"
     database := "database"
+    // postgresql options
     optionMap := map[string]string{
         "sslMode": gol.PostgresqlSslModeDisable,
-        "sslMode": gol.PostgresqlSslModeRequire,
-        "sslMode": gol.PostgresqlSslModeVerifyCa,
-        "sslMode": gol.PostgresqlSslModeVerifyFull,
+        // "sslMode": gol.PostgresqlSslModeRequire,
+        // "sslMode": gol.PostgresqlSslModeVerifyCa,
+        // "sslMode": gol.PostgresqlSslModeVerifyFull,
     }
 
     db, err := gol.NewClient(databaseType, host, port, user, pass, database, optionMap)
@@ -141,22 +143,23 @@ func Sample() error {
 
     // insert
     {
-        data := User{}
-        data.Name = "sample"
+        data := Item{}
+        data.Num = 1
+        data.Str = "sample"
 
-        table := User{}
+        table := Item{}
         query := db.NewQuery(&table)
         query.SetValuesColumn(
-            &table.Name,
-            &table.Mail,
+            &table.Num,
+            &table.Str,
         )
         query.SetValues(
-            data.Name,
-            data.Mail,
+            data.Num,
+            data.Str,
         )
 
-        // query: INSERT INTO "user" ("name", "mail") VALUES ($1, $2)
-        // values: ["sample", NULL]
+        // query: INSERT INTO "item" ("num", "str") VALUES (?)
+        // values: [1 "sample"]
         _, err = query.Insert()
         if err != nil {
             return err
@@ -168,31 +171,32 @@ func Sample() error {
         // If you want to set the number of bulk inserts, do as follows.
         db.Config.SetBulkInsertCount(2) // default 500
 
-        table := User{}
+        table := Item{}
         query := db.NewQuery(&table)
         query.SetValuesColumn(
-            &table.Name,
-            &table.Mail,
+            &table.Num,
+            &table.Str,
         )
         for i := 0; i < 3; i++ {
-            data := User{}
-            data.Name = fmt.Sprintf("sample_%v", i)
+            data := Item{}
+            data.Num = i
+            data.Str = fmt.Sprintf("sample_%v", i)
 
             query.SetValues(
-                data.Name,
-                data.Mail,
+                data.Num,
+                data.Str,
             )
 
-            // query: INSERT INTO "user" ("name", "mail") VALUES ($1, $2),($1, $2)
-            // values: ["sample_0", NULL, "sample_1", NULL]
+            // query: INSERT INTO "item" ("num", "str") VALUES (?, ?),(?, ?)
+            // values: [0 "sample_0" 1 "sample_1"]
             _, err := query.BulkInsert()
             if err != nil {
                 return err
             }
         }
 
-        // query: INSERT INTO "user" ("name", "mail") VALUES ($1, $2)
-        // values: ["sample_2", NULL]
+        // query: INSERT INTO "item" ("num", "str") VALUES (?, ?)
+        // values: [2 "sample_2"]
         _, err := query.BulkInsertFinish()
         if err != nil {
             return err
@@ -201,15 +205,16 @@ func Sample() error {
 
     // update
     {
-        data := User{}
-        data.Name = "sample"
+        data := Item{}
+        data.Num = 1
+        data.Str = "sample"
 
-        table := User{}
+        table := Item{}
         query := db.NewQuery(&table)
-        query.SetSet(&table.Name, data.Name)
-        query.SetWhereIs(&table.Mail, data.Mail)
+        query.SetSet(&table.Str, data.Str)
+        query.SetWhereIs(&table.Num, data.Num)
 
-        // query: UPDATE "user" SET "name" = $1 WHERE "user"."mail" IS NULL
+        // query: UPDATE "item" SET "str" = ? WHERE "item"."num" = 1
         // values: ["sample"]
         _, err = query.Update()
         if err != nil {
@@ -219,11 +224,11 @@ func Sample() error {
 
     // delete
     {
-        table := User{}
+        table := Item{}
         query := db.NewQuery(&table)
         query.SetWhereIs(&table.Id, 1)
 
-        // query: DELETE FROM "user" WHERE "user"."id" = $1
+        // query: DELETE FROM "item" WHERE "item"."id" = $1
         // values: [1]
         _, err = query.Delete()
         if err != nil {
@@ -233,13 +238,13 @@ func Sample() error {
 
     // select
     {
-        var resultList []*User{}
+        var resultList []*Item{}
         // var resultList []map[string]interface{}
-        table := User{}
+        table := Item{}
         query := db.NewQuery(&table)
         query.SetSelectAll(&table)
         query.SetWhereIs(&table.Id, 1)
-        // query: SELECT "user".* FROM "user" WHERE "user"."id" = $1
+        // query: SELECT "item".* FROM "item" WHERE "item"."id" = $1
         // values: [1]
         err = query.Select(&resultList)
         if err != nil {
@@ -252,14 +257,15 @@ func Sample() error {
     // select join
     {
         var resultList []*struct{
-            User
+            Item
             Sample `column:"sample" json:"sample"`
         }
-        table := User{}
+        table := Item{}
         tableDetail := UserDetail{}
         query := db.NewQuery()
         query.SetTable(&table)
-        query.SetJoin(&tableDetail, &tableDetail.UserId, " = ", &table.Id)
+        query.SetJoin(&tableDetail)
+        query.SetJoinWhere(&tableDetail, &tableDetail.UserId, " = ", &table.Id)
         query.SetSelect(&table)
         query.SetSelect(
             &table.Id,
@@ -267,7 +273,7 @@ func Sample() error {
         )
         query.SetWhereIs(&table.Id, 1)
 
-        // query: SELECT "user"."id", "public"."user_detail"."sample" FROM "user" JOIN "public"."user_detail"."id" ON "public"."user_detail"."user_id" = "user"."id" WHERE "user"."id" = $1
+        // query: SELECT "item"."id", "public"."item_detail"."sample" FROM "item" JOIN "public"."item_detail"."id" ON "public"."item_detail"."user_id" = "item"."id" WHERE "item"."id" = $1
         // values: [1]
         err = query.Select(&resultList)
         if err != nil {
@@ -278,7 +284,7 @@ func Sample() error {
     // database/sql.DB.Exec
     {
         // All placeholders are ?, no problem
-        _, err := db.Exec(`insert into user ("name", "mail") values (?, ?)`, "myname", "my@example.com")
+        _, err := db.Exec(`insert into item ("str") values (?)`, "sample")
         if err != nil {
             return err
         }
@@ -287,7 +293,7 @@ func Sample() error {
     // database/sql.DB.Query
     {
         // All placeholders are ?, no problem
-        rows, err := db.Query(`select "user"."name" from "user" where "user"."id" = ?`, 1)
+        rows, err := db.Query(`select "item"."str" from "item" where "item"."id" = ?`, 1)
         if err != nil {
             return err
         }
@@ -301,8 +307,8 @@ func Sample() error {
     // database/sql.DB.Query + 
     {
         // Client.Find() is Extract after executing query
-        var resultList []*User{}
-        err := db.Find(&resultList, `select "user"."name" from "user" where "user"."id" = ?`, 1)
+        var resultList []*Item{}
+        err := db.Find(&resultList, `select "item"."str" from "item" where "item"."id" = ?`, 1)
         if err != nil {
             return err
         }
@@ -325,34 +331,39 @@ func Sample() error {
 |method|sql|
 |---|---|
 |SetTable(tablePtr interface{})|FROM tablePtr|
-|SetTableAs(tablePtr interface{}, tableAs string)|FROM tablePtr as tableAs|
 ``` go
-table := User{}
-query := db.NewQuery(&table)
-query.SetTable(&table) // query: "user"
-query.SetTableAs(&table, "t") // query: "user" as "t"
+table := Item{}
+query := db.NewQuery()
+query.SetTable(&table) // query: "item"
+```
+
+
+## from
+|method|sql|
+|---|---|
+|SetFrom(tablePtr interface{}, valueList ...interface{})|FROM [tablePtr or valueList...]|
+``` go
+table := Item{}
+query := db.NewQuery()
+query.SetFrom(&table) // query: "item" as "t1"
+query.SetFrom(&table, `(SELECT * FROM "item" WHERE "id" = ?)`, []interface{}{1]}) // query: (SELECT * FROM "item" WHERE "id" = ?) as "t1" values: [1]
 ```
 
 
 ## join
 |method|sql|
 |---|---|
-|SetJoin(tablePtr interface{}, valueList []interface{})|JOIN tablePtr [ON ...]|
-|SetJoinAs(tablePtr interface{}, tableAs string, valueList []interface{})|JOIN tablePtr [ON ...]|
-|SetJoinLeft(tablePtr interface{}, valueList []interface{})|LEFT JOIN tablePtr [ON ...]|
-|SetJoinLeftAs(tablePtr interface{}, tableAs string, valueList []interface{})|LEFT JOIN tablePtr as tableAs [ON ...]|
-|SetJoinRight(tablePtr interface{}, valueList []interface{})|RIGHT JOIN tablePtr [ON ...]|
-|SetJoinRightAs(tablePtr interface{}, tableAs string, valueList []interface{})|RIGHT JOIN tablePtr [ON ...]|
+|SetJoin(tablePtr interface{}, valueList ...interface{})|JOIN [tablePtr or valueList...] ON|
+|SetJoinLeft(tablePtr interface{}, valueList ...interface{})|LEFT JOIN [tablePtr or valueList...] ON|
+|SetJoinRight(tablePtr interface{}, valueList ...interface{})|RIGHT JOIN [tablePtr or valueList...] ON|
 ``` go
-table := User{}
+table := Item{}
 join := Detail{}
-query := db.NewQuery(&table)
-query.SetJoin(&join, &join.UserId, "=", &table.Id) // query: JOIN "public"."user_detail" ON "public"."user_detail"."user_id" = "user"."id"
-query.SetJoinAs(&join, "t", &join.UserId, "!=", &table.Id) // query: JOIN "public"."user_detail" as "t" ON "t"."id" != "user"."id"
-query.SetJoinLeft(&join, &join.UserId, "=", &table.Id) // query: LEFT JOIN "public"."user_detail" ON "public"."user_detail"."user_id" = "user"."id"
-query.SetJoinLeftAs(&join, "t", &join.UserId, "!=", &table.Id) // query: LEFT JOIN "public"."user_detail" as "t" ON "t"."id" != "user"."id"
-query.SetJoinRigth(&join, &join.UserId, "=", &table.Id) // query: RIGHT JOIN "public"."user_detail" ON "public"."user_detail"."user_id" = "user"."id"
-query.SetJoinRightAs(&join, "t", &join.UserId, "!=", &table.Id) // query: RIGHT JOIN "public"."user_detail" as "t" ON "t"."id" != "user"."id"
+query := db.NewQuery()
+query.SetJoin(&join) // query: INNER JOIN "public"."item_detail" as "t1" ON
+query.SetJoinLeft(&join) // query: LEFT JOIN "public"."item_detail" as "t1" ON
+query.SetJoinRigth(&join) // query: RIGHT JOIN "public"."item_detail" as "t1" ON
+query.SetJoin(&join, "(select ?)", []interface{}{1}) // query: INNER JOIN (select ?) as "t1" ON values: [1]
 ```
 
 
@@ -385,26 +396,26 @@ query.SetJoinRightAs(&join, "t", &join.UserId, "!=", &table.Id) // query: RIGHT 
 |SetJoinWhereOrNest()|ON ? [or] (|
 |SetJoinWhereNestClose()|ON ? )|
 ``` go
-table := User{}
+table := Item{}
 join := Detail{}
 query := db.NewQuery(&table)
-query.SetJoin(&join, &join.UserId, "=", &table.Id)
-query.SetWhere(&join, &table.Id, "= ? or 1 = ?", []interface{}{1, 2}) // query: "user_detail"."id" = ? or 1 = ? values: [1, 2]
-query.SetWhereIs(&join, &table.Id, 1) // query: "user_detail"."id" = 1 values: [1]
-query.SetWhereIs(&join, "max(", &table.Id, ")", 1) // query: max("user_detail"."id") = 1 values: [1]
-query.SetWhereIs(&join, &table.Id, nil) // query: "user_detail"."id" IS NULL
-query.SetWhereIsNot(&join, &table.Id, 1) // query: "user_detail"."id" != 1 values: [1]
-query.SetWhereIsNot(&join, &table.Id, nil) // query: "user_detail"."id" IS NOT NULL
-query.SetWhereLike(&join, &table.Name, "abc%") // query: "user_detail"."name" like 'abc%' values: ["abc%"]
-query.SetWhereLikeNot(&join, &table.Name, "abc%") // query: "user_detail"."name" like not 'abc%' values: ["abc%"]
-query.SetWhereIn(&join, &table.Id, []interface{}{1, 2, 3}) // query: "user_detail"."id" IN (1, 2, 3) values: [1, 2, 3]
-query.SetWhereInNot(&join, &table.Id, []interface{}{1, 2, 3}) // query: "user_detail"."id" IN NOT (1, 2, 3) values: [1, 2, 3]
-query.SetWhereGt(&join, &table.Id, 1) // query: "user_detail"."id" > 1 values: [1]
-query.SetWhereGte(&join, &table.Id, 1) // query: "user_detail"."id" => 1 values: [1]
-query.SetWhereLt(&join, &table.Id, 1) // query: "user_detail"."id" < 1 values: [1]
-query.SetWhereLte(&join, &table.Id, 1) // query: "user_detail"."id" =< 1 values: [1]
-query.SetWhereNest(&join) // query: (
-query.SetWhereNestClose(&join) // query: )
+query.SetJoin(&join)
+query.SetJoinWhere(&join, &table.Id, "= ? or 1 = ?", []interface{}{1, 2}) // query: "item_detail"."id" = ? or 1 = ? values: [1 2]
+query.SetJoinWhereIs(&join, &table.Id, 1) // query: "item_detail"."id" = 1 values: [1]
+query.SetJoinWhereIs(&join, "max(", &table.Id, ")", 1) // query: max("item_detail"."id") = 1 values: [1]
+query.SetJoinWhereIs(&join, &table.Id, nil) // query: "item_detail"."id" IS NULL
+query.SetJoinWhereIsNot(&join, &table.Id, 1) // query: "item_detail"."id" != 1 values: [1]
+query.SetJoinWhereIsNot(&join, &table.Id, nil) // query: "item_detail"."id" IS NOT NULL
+query.SetJoinWhereLike(&join, &table.Str, "abc%") // query: "item_detail"."str" like 'abc%' values: ["abc%"]
+query.SetJoinWhereLikeNot(&join, &table.Str, "abc%") // query: "item_detail"."str" like not 'abc%' values: ["abc%"]
+query.SetJoinWhereIn(&join, &table.Id, []interface{}{1, 2, 3}) // query: "item_detail"."id" IN (1, 2, 3) values: [1 2 3]
+query.SetJoinWhereInNot(&join, &table.Id, []interface{}{1, 2, 3}) // query: "item_detail"."id" IN NOT (1, 2, 3) values: [1 2 3]
+query.SetJoinWhereGt(&join, &table.Id, 1) // query: "item_detail"."id" > 1 values: [1]
+query.SetJoinWhereGte(&join, &table.Id, 1) // query: "item_detail"."id" => 1 values: [1]
+query.SetJoinWhereLt(&join, &table.Id, 1) // query: "item_detail"."id" < 1 values: [1]
+query.SetJoinWhereLte(&join, &table.Id, 1) // query: "item_detail"."id" =< 1 values: [1]
+query.SetJoinWhereNest(&join) // query: (
+query.SetJoinWhereNestClose(&join) // query: )
 ```
 
 
@@ -415,9 +426,9 @@ query.SetWhereNestClose(&join) // query: )
 |SetValues(valueList ...interface{})|VALUES (valueList...)|
 |SetValuesClear()|is values clear|
 ``` go
-table := User{}
+table := Item{}
 query := db.NewQuery(&table)
-query.SetValuesColumn(&table.Id, &talbe.Name) // query: INTO "user" ("id", "name")
+query.SetValuesColumn(&table.Id, &talbe.Str) // query: INTO "item" ("id", "str")
 query.SetValues(1, "abc") // query: VALUES (?, ?) values: [1, "abc"]
 query.SetValuesClear() // query: values delete
 ```
@@ -428,7 +439,7 @@ query.SetValuesClear() // query: values delete
 |---|---|
 |SetSet(columnPtr interface{}, value interface{})|SET columnPtr = value|
 ``` go
-table := User{}
+table := Item{}
 query := db.NewQuery(&table)
 query.SetSet(&table.Id, 1) // query: "id" = 1
 ```
@@ -440,10 +451,10 @@ query.SetSet(&table.Id, 1) // query: "id" = 1
 |SetSelect(valueList ...interface{})|SELECT valueList...|
 |SetSelectAll(tablePtr interface{})|SELECT tablePtr.*|
 ``` go
-table := User{}
+table := Item{}
 query := db.NewQuery(&table)
-query.SetSelect("count(", &table, ")") // query: count("user")
-query.SetSelectAll(&table) // query: "user".*
+query.SetSelect("count(", &table, ")", []interface{}{1}) // query: count("item"), values: [1]
+query.SetSelectAll(&table) // query: "item".*
 ```
 
 
@@ -472,26 +483,26 @@ query.SetSelectAll(&table) // query: "user".*
 |SetWhereOrGte(valueList ...interface{})|WHERE [or] columnPtr >= ?|
 |SetWhereOrLt(valueList ...interface{})|WHERE [or] columnPtr < ?|
 |SetWhereOrLte(valueList ...interface{})|WHERE [or] columnPtr =< ?|
-|SetWhereNest()|WHERE ? [and] (|
-|SetWhereOrNest()|WHERE ? [or] (|
-|SetWhereNestClose()|WHERE ? )|
+|SetWhereNest()|WHERE [and] (|
+|SetWhereOrNest()|WHERE [or] (|
+|SetWhereNestClose()|WHERE )|
 ``` go
-table := User{}
+table := Item{}
 query := db.NewQuery(&table)
-query.SetWhere(&table.Id, "= ? or 1 = ?", []interface{}{1, 2}) // query: "user"."id" = ? or 1 = ? values: [1, 2]
-query.SetWhereIs(&table.Id, 1) // query: "user"."id" = 1 values: [1]
-query.SetWhereIs("max(", &table.Id, ")", 1) // query: max("user"."id") = 1 values: [1]
-query.SetWhereIs(&table.Id, nil) // query: "user"."id" IS NULL
-query.SetWhereIsNot(&table.Id, 1) // query: "user"."id" != 1 values: [1]
-query.SetWhereIsNot(&table.Id, nil) // query: "user"."id" IS NOT NULL
-query.SetWhereLike(&table.Name, "abc%") // query: "user"."name" like 'abc%' values: ["abc%"]
-query.SetWhereLikeNot(&table.Name, "abc%") // query: "user"."name" like not 'abc%' values: ["abc%"]
-query.SetWhereIn(&table.Id, []interface{}{1, 2, 3}) // query: "user"."id" IN (1, 2, 3) values: [1, 2, 3]
-query.SetWhereInNot(&table.Id, []interface{}{1, 2, 3}) // query: "user"."id" IN NOT (1, 2, 3) values: [1, 2, 3]
-query.SetWhereGt(&table.Id, 1) // query: "user"."id" > 1 values: [1]
-query.SetWhereGte(&table.Id, 1) // query: "user"."id" => 1 values: [1]
-query.SetWhereLt(&table.Id, 1) // query: "user"."id" < 1 values: [1]
-query.SetWhereLte(&table.Id, 1) // query: "user"."id" =< 1 values: [1]
+query.SetWhere(&table.Id, "= ? or 1 = ?", []interface{}{1, 2}) // query: "item"."id" = ? or 1 = ? values: [1 2]
+query.SetWhereIs(&table.Id, 1) // query: "item"."id" = 1 values: [1]
+query.SetWhereIs("max(", &table.Id, ")", 1) // query: max("item"."id") = 1 values: [1]
+query.SetWhereIs(&table.Id, nil) // query: "item"."id" IS NULL
+query.SetWhereIsNot(&table.Id, 1) // query: "item"."id" != 1 values: [1]
+query.SetWhereIsNot(&table.Id, nil) // query: "item"."id" IS NOT NULL
+query.SetWhereLike(&table.Str, "abc%") // query: "item"."str" like 'abc%' values: ["abc%"]
+query.SetWhereLikeNot(&table.Str, "abc%") // query: "item"."str" like not 'abc%' values: ["abc%"]
+query.SetWhereIn(&table.Id, []interface{}{1, 2, 3}) // query: "item"."id" IN (1, 2, 3) values: [1 2 3]
+query.SetWhereInNot(&table.Id, []interface{}{1, 2, 3}) // query: "item"."id" IN NOT (1, 2, 3) values: [1 2 3]
+query.SetWhereGt(&table.Id, 1) // query: "item"."id" > 1 values: [1]
+query.SetWhereGte(&table.Id, 1) // query: "item"."id" => 1 values: [1]
+query.SetWhereLt(&table.Id, 1) // query: "item"."id" < 1 values: [1]
+query.SetWhereLte(&table.Id, 1) // query: "item"."id" =< 1 values: [1]
 query.SetWhereNest() // query: (
 query.SetWhereNestClose() // query: )
 ```
@@ -502,9 +513,9 @@ query.SetWhereNestClose() // query: )
 |---|---|
 |SetGroupBy(valueList ...interface{})|GROUP BY valueList|
 ``` go
-table := User{}
+table := Item{}
 query := db.NewQuery(&table)
-query.SetGroupBy("count(", &table.Id, ")") // query: GROUP BY count("user"."id")
+query.SetGroupBy("count(", &table.Id, ")") // query: GROUP BY count("item"."id")
 ```
 
 
@@ -537,22 +548,22 @@ query.SetGroupBy("count(", &table.Id, ")") // query: GROUP BY count("user"."id")
 |SetHavingOrNest()|Having ? [or] (|
 |SetHavingNestClose()|Having ? )|
 ``` go
-table := User{}
+table := Item{}
 query := db.NewQuery(&table)
-query.SetHaving(&table.Id, "= ? or 1 = ?", []interface{}{1, 2}) // query: "user"."id" = ? or 1 = ? values: [1, 2]
-query.SetHavingIs(&table.Id, 1) // query: "user"."id" = 1 values: [1]
-query.SetHavingIs("max(", &table.Id, ")", 1) // query: max("user"."id") = 1 values: [1]
-query.SetHavingIs(&table.Id, nil) // query: "user"."id" IS NULL
-query.SetHavingIsNot(&table.Id, 1) // query: "user"."id" != 1 values: [1]
-query.SetHavingIsNot(&table.Id, nil) // query: "user"."id" IS NOT NULL
-query.SetHavingLike(&table.Name, "abc%") // query: "user"."name" like 'abc%' values: ["abc%"]
-query.SetHavingLikeNot(&table.Name, "abc%") // query: "user"."name" like not 'abc%' values: ["abc%"]
-query.SetHavingIn(&table.Id, []interface{}{1, 2, 3}) // query: "user"."id" IN (1, 2, 3) values: [1, 2, 3]
-query.SetHavingInNot(&table.Id, []interface{}{1, 2, 3}) // query: "user"."id" IN NOT (1, 2, 3) values: [1, 2, 3]
-query.SetHavingGt(&table.Id, 1) // query: "user"."id" > 1 values: [1]
-query.SetHavingGte(&table.Id, 1) // query: "user"."id" => 1 values: [1]
-query.SetHavingLt(&table.Id, 1) // query: "user"."id" < 1 values: [1]
-query.SetHavingLte(&table.Id, 1) // query: "user"."id" =< 1 values: [1]
+query.SetHaving(&table.Id, "= ? or 1 = ?", []interface{}{1, 2}) // query: "item"."id" = ? or 1 = ? values: [1 2]
+query.SetHavingIs(&table.Id, 1) // query: "item"."id" = 1 values: [1]
+query.SetHavingIs("max(", &table.Id, ")", 1) // query: max("item"."id") = 1 values: [1]
+query.SetHavingIs(&table.Id, nil) // query: "item"."id" IS NULL
+query.SetHavingIsNot(&table.Id, 1) // query: "item"."id" != 1 values: [1]
+query.SetHavingIsNot(&table.Id, nil) // query: "item"."id" IS NOT NULL
+query.SetHavingLike(&table.Str, "abc%") // query: "item"."str" like 'abc%' values: ["abc%"]
+query.SetHavingLikeNot(&table.Str, "abc%") // query: "item"."str" like not 'abc%' values: ["abc%"]
+query.SetHavingIn(&table.Id, []interface{}{1, 2, 3}) // query: "item"."id" IN (1, 2, 3) values: [1 2 3]
+query.SetHavingInNot(&table.Id, []interface{}{1, 2, 3}) // query: "item"."id" IN NOT (1, 2, 3) values: [1 2 3]
+query.SetHavingGt(&table.Id, 1) // query: "item"."id" > 1 values: [1]
+query.SetHavingGte(&table.Id, 1) // query: "item"."id" => 1 values: [1]
+query.SetHavingLt(&table.Id, 1) // query: "item"."id" < 1 values: [1]
+query.SetHavingLte(&table.Id, 1) // query: "item"."id" =< 1 values: [1]
 query.SetHavingNest() // query: (
 query.SetHavingNestClose() // query: )
 ```
@@ -565,11 +576,11 @@ query.SetHavingNestClose() // query: )
 |SetOrderByAsc(valueList ...interface{})|ORDER BY valueList|
 |SetOrderByDesc(valueList ...interface{})|ORDER BY valueList DESC|
 ``` go
-table := User{}
+table := Item{}
 query := db.NewQuery(&table)
-query.SetOrderBy(&table.Id) // query: ORDER BY count("user"."id")
-query.SetOrderByAsc("count(", &table.Id, ")") // query: ORDER BY count("user"."id") ASC
-query.SetOrderByDesc("count(", &table.Id, ")") // query: ORDER BY count("user"."id") DESC
+query.SetOrderBy(&table.Id) // query: ORDER BY count("item"."id")
+query.SetOrderByAsc("count(", &table.Id, ")") // query: ORDER BY count("item"."id") ASC
+query.SetOrderByDesc("count(", &table.Id, ")") // query: ORDER BY count("item"."id") DESC
 ```
 
 
@@ -578,7 +589,7 @@ query.SetOrderByDesc("count(", &table.Id, ")") // query: ORDER BY count("user"."
 |---|---|
 |SetLimit(num int)|LIMIT num|
 ``` go
-table := User{}
+table := Item{}
 query := db.NewQuery(&table)
 query.SetLimit(1) // query: LIMIT 1
 ```
@@ -589,7 +600,7 @@ query.SetLimit(1) // query: LIMIT 1
 |---|---|
 |SetOffset(num int)|OFFSET num|
 ``` go
-table := User{}
+table := Item{}
 query := db.NewQuery(&table)
 query.SetOffset(1) // query: OFFSET 1
 ```

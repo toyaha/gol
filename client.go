@@ -118,7 +118,7 @@ func (rec *Client) Init(databaseType string, host string, port string, user stri
 
 func (rec *Client) AddMeta(tablePtrList ...interface{}) {
 	for _, val := range tablePtrList {
-		rec.Meta.Add("", val, "")
+		rec.Meta.Add(val, false)
 	}
 }
 
@@ -186,38 +186,15 @@ func (rec *Client) GetTableAsColumn(any interface{}) string {
 	return rec.Meta.GetTableAsColumn(any)
 }
 
-func (rec *Client) NewQueryDefault() *Query {
+func (rec *Client) NewQuery(tablePtrList ...interface{}) *Query {
 	query := NewQuery(rec.Config)
 	query.SetClient(rec)
-	return query
-}
-
-func (rec *Client) NewQuery(tablePtrList ...interface{}) *Query {
-	query := rec.NewQueryDefault()
 	if len(tablePtrList) > 0 {
 		for _, val := range tablePtrList {
 			query.AddMeta(val)
 		}
 		query.SetTable(tablePtrList[0])
 	}
-	return query
-}
-
-func (rec *Client) NewQueryWithSchema(schema string, tablePtr interface{}) *Query {
-	query := rec.NewQueryDefault()
-	query.SetTableWithSchema(schema, tablePtr)
-	return query
-}
-
-func (rec *Client) NewQueryAs(tablePtr interface{}, alias string) *Query {
-	query := rec.NewQueryDefault()
-	query.SetTableAs(tablePtr, alias)
-	return query
-}
-
-func (rec *Client) NewQueryAsWithSchema(schema string, tablePtr interface{}, alias string) *Query {
-	query := rec.NewQueryDefault()
-	query.SetTableAsWithSchema(schema, tablePtr, alias)
 	return query
 }
 

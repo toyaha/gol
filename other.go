@@ -290,9 +290,7 @@ func buildQueryWhere(meta *Meta, errPrefix string, useAs bool, mode int, dataLis
 		}
 		for _, val := range dataList {
 			if ty := fmt.Sprintf("%T", val); ty == "[]interface {}" {
-				for _, value := range val.([]interface{}) {
-					valueList = append(valueList, value)
-				}
+				valueList = append(valueList, val.([]interface{})...)
 			} else {
 				if data := meta.Get(val); data != nil {
 					query = fmt.Sprintf("%v%v", query, fnGetName(data))

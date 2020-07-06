@@ -32,26 +32,40 @@ const (
 )
 
 var (
-	TableItem1 = Item{}
-	TableItem2 = Item{}
-	TableItem3 = Item{}
-	TableItem4 = Item{}
+	TableItem1       = Item{}
+	TableItem2       = Item{}
+	TableItem3       = Item{}
+	TableItem4       = Item{}
+	TableItem5       = Item{}
+	TableItemDetail1 = ItemDetail{}
+	TableItemDetail2 = ItemDetail{}
+	TableItemDetail3 = ItemDetail{}
+	TableItemDetail4 = ItemDetail{}
+	TableItemDetail5 = ItemDetail{}
+	TableTag1        = Tag{}
+	TableTag2        = Tag{}
+	TableTag3        = Tag{}
+	TableTag4        = Tag{}
+	TableTag5        = Tag{}
 )
 
 type Item struct {
-	Id        int          `column:"id" json:"id"`
-	CreatedAt time.Time    `column:"created_at" json:"created_at"`
-	UpdatedAt time.Time    `column:"updated_at" json:"updated_at"`
-	DeletedAt gol.NullTime `column:"deleted_at" json:"deleted_at"`
-	Name      string       `column:"name" json:"name"`
+	Id        int          `json:"id"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
+	DeletedAt gol.NullTime `json:"deleted_at"`
+	Num       int          `json:"num"`
+	Str       string       `json:"str"`
 }
 
-type ItemMssql struct {
-	Id        int          `schema:"dbo" table:"item" column:"id" json:"id"`
-	CreatedAt time.Time    `schema:"dbo" table:"item" column:"created_at" json:"created_at"`
-	UpdatedAt time.Time    `schema:"dbo" table:"item" column:"updated_at" json:"updated_at"`
-	DeletedAt gol.NullTime `schema:"dbo" table:"item" column:"deleted_at" json:"deleted_at"`
-	Name      string       `schema:"dbo" table:"item" column:"name" json:"name"`
+type ItemDetail struct {
+	Id        int           `json:"id"`
+	CreatedAt time.Time     `json:"created_at"`
+	UpdatedAt time.Time     `json:"updated_at"`
+	DeletedAt gol.NullTime  `json:"deleted_at"`
+	ItemId    gol.NullInt64 `json:"item_id"`
+	Num       int           `json:"num"`
+	Str       string        `json:"str"`
 }
 
 type Tag struct {
@@ -59,7 +73,8 @@ type Tag struct {
 	CreatedAt time.Time    `schema:"PUBLIC" table:"TAG" column:"CREATED_AT" json:"created_at"`
 	UpdatedAt time.Time    `schema:"PUBLIC" table:"TAG" column:"UPDATED_AT" json:"updated_at"`
 	DeletedAt gol.NullTime `schema:"PUBLIC" table:"TAG" column:"DELETED_AT" json:"deleted_at"`
-	Name      string       `schema:"PUBLIC" table:"TAG" column:"NAME" json:"name"`
+	Num       string       `schema:"PUBLIC" table:"TAG" column:"NUM" json:"NUM"`
+	Str       string       `schema:"PUBLIC" table:"TAG" column:"STR" json:"STR"`
 }
 
 func NewClientMssql() (*gol.Client, error) {

@@ -17,7 +17,7 @@ func TestQueryMeta(t *testing.T) {
 		queryMeta.NamingConventionForTable = metaList[1]
 		queryMeta.NamingConventionForColumn = metaList[2]
 
-		err := queryMeta.Add(tableList[0].(string), tableList[1], tableList[2].(string))
+		err := queryMeta.Add(tableList[0], tableList[1].(bool))
 		if err != nil {
 			t.Error(err)
 			return
@@ -191,315 +191,339 @@ func TestQueryMeta(t *testing.T) {
 		}
 	}
 
-	t.Run("mysql table", func(t *testing.T) {
-		metaList := []string{
+	t.Run("mssql item", func(t *testing.T) {
+		var metaList = []string{
+			gol.DatabaseTypeMssql,
+			gol.NamingConventionSnakeCase,
+			gol.NamingConventionSnakeCase,
+		}
+		var tableList = []interface{}{&tableItem, false}
+		var field interface{} = &tableItem.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          "",
+			"BaseTable":           "item",
+			"BaseAs":              "",
+			"BaseColumn":          "str",
+			"Schema":              "",
+			"Table":               "[item]",
+			"As":                  "",
+			"Column":              "[str]",
+			"TableColumn":         "[item].[str]",
+			"TableAs":             "[item]",
+			"TableAsColumn":       "[item].[str]",
+			"SchemaTable":         "[item]",
+			"SchemaTableColumn":   "[item].[str]",
+			"SchemaTableAs":       "[item]",
+			"SchemaTableAsColumn": "[item].[str]",
+		}
+		fn(t, metaList, tableList, field, checkMap)
+	})
+
+	t.Run("mssql tag", func(t *testing.T) {
+		var metaList = []string{
+			gol.DatabaseTypeMssql,
+			gol.NamingConventionSnakeCase,
+			gol.NamingConventionSnakeCase,
+		}
+		var tableList = []interface{}{&tableTag, false}
+		var field interface{} = &tableTag.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          "PUBLIC",
+			"BaseTable":           "TAG",
+			"BaseAs":              "",
+			"BaseColumn":          "STR",
+			"Schema":              "[PUBLIC]",
+			"Table":               "[TAG]",
+			"As":                  "",
+			"Column":              "[STR]",
+			"TableColumn":         "[TAG].[STR]",
+			"TableAs":             "[TAG]",
+			"TableAsColumn":       "[TAG].[STR]",
+			"SchemaTable":         "[PUBLIC].[TAG]",
+			"SchemaTableColumn":   "[PUBLIC].[TAG].[STR]",
+			"SchemaTableAs":       "[PUBLIC].[TAG]",
+			"SchemaTableAsColumn": "[PUBLIC].[TAG].[STR]",
+		}
+		fn(t, metaList, tableList, field, checkMap)
+	})
+
+	t.Run("mssql item as", func(t *testing.T) {
+		var metaList = []string{
+			gol.DatabaseTypeMssql,
+			gol.NamingConventionSnakeCase,
+			gol.NamingConventionSnakeCase,
+		}
+		var tableList = []interface{}{&tableItem, true}
+		var field interface{} = &tableItem.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          "",
+			"BaseTable":           "item",
+			"BaseAs":              "t1",
+			"BaseColumn":          "str",
+			"Schema":              "",
+			"Table":               "[item]",
+			"As":                  "[t1]",
+			"Column":              "[str]",
+			"TableColumn":         "[item].[str]",
+			"TableAs":             "[t1]",
+			"TableAsColumn":       "[t1].[str]",
+			"SchemaTable":         "[item]",
+			"SchemaTableColumn":   "[item].[str]",
+			"SchemaTableAs":       "[t1]",
+			"SchemaTableAsColumn": "[t1].[str]",
+		}
+		fn(t, metaList, tableList, field, checkMap)
+	})
+
+	t.Run("mssql tag as", func(t *testing.T) {
+		var metaList = []string{
+			gol.DatabaseTypeMssql,
+			gol.NamingConventionSnakeCase,
+			gol.NamingConventionSnakeCase,
+		}
+		var tableList = []interface{}{&tableTag, true}
+		var field interface{} = &tableTag.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          "PUBLIC",
+			"BaseTable":           "TAG",
+			"BaseAs":              "t1",
+			"BaseColumn":          "STR",
+			"Schema":              "[PUBLIC]",
+			"Table":               "[TAG]",
+			"As":                  "[t1]",
+			"Column":              "[STR]",
+			"TableColumn":         "[TAG].[STR]",
+			"TableAs":             "[t1]",
+			"TableAsColumn":       "[t1].[STR]",
+			"SchemaTable":         "[PUBLIC].[TAG]",
+			"SchemaTableColumn":   "[PUBLIC].[TAG].[STR]",
+			"SchemaTableAs":       "[t1]",
+			"SchemaTableAsColumn": "[t1].[STR]",
+		}
+		fn(t, metaList, tableList, field, checkMap)
+	})
+
+	t.Run("mysql item", func(t *testing.T) {
+		var metaList = []string{
 			gol.DatabaseTypeMysql,
 			gol.NamingConventionSnakeCase,
 			gol.NamingConventionSnakeCase,
 		}
-		{
-			tableList := []interface{}{"", &tableItem, ""}
-			var field interface{} = &tableItem.Name
-			checkMap := map[string]string{
-				"BaseSchema":          "",
-				"BaseTable":           "item",
-				"BaseAs":              "",
-				"BaseColumn":          "name",
-				"Schema":              "",
-				"Table":               "`item`",
-				"As":                  "",
-				"Column":              "`name`",
-				"TableColumn":         "`item`.`name`",
-				"TableAs":             "`item`",
-				"TableAsColumn":       "`item`.`name`",
-				"SchemaTable":         "`item`",
-				"SchemaTableColumn":   "`item`.`name`",
-				"SchemaTableAs":       "`item`",
-				"SchemaTableAsColumn": "`item`.`name`",
-			}
-			fn(t, metaList, tableList, field, checkMap)
+		var tableList = []interface{}{&tableItem, false}
+		var field interface{} = &tableItem.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          "",
+			"BaseTable":           "item",
+			"BaseAs":              "",
+			"BaseColumn":          "str",
+			"Schema":              "",
+			"Table":               "`item`",
+			"As":                  "",
+			"Column":              "`str`",
+			"TableColumn":         "`item`.`str`",
+			"TableAs":             "`item`",
+			"TableAsColumn":       "`item`.`str`",
+			"SchemaTable":         "`item`",
+			"SchemaTableColumn":   "`item`.`str`",
+			"SchemaTableAs":       "`item`",
+			"SchemaTableAsColumn": "`item`.`str`",
 		}
-		{
-			tableList := []interface{}{"", &tableTag, ""}
-			var field interface{} = &tableTag.Name
-			checkMap := map[string]string{
-				"BaseSchema":          "PUBLIC",
-				"BaseTable":           "TAG",
-				"BaseAs":              "",
-				"BaseColumn":          "NAME",
-				"Schema":              "`PUBLIC`",
-				"Table":               "`TAG`",
-				"As":                  "",
-				"Column":              "`NAME`",
-				"TableColumn":         "`TAG`.`NAME`",
-				"TableAs":             "`TAG`",
-				"TableAsColumn":       "`TAG`.`NAME`",
-				"SchemaTable":         "`PUBLIC`.`TAG`",
-				"SchemaTableColumn":   "`PUBLIC`.`TAG`.`NAME`",
-				"SchemaTableAs":       "`PUBLIC`.`TAG`",
-				"SchemaTableAsColumn": "`PUBLIC`.`TAG`.`NAME`",
-			}
-			fn(t, metaList, tableList, field, checkMap)
-		}
+		fn(t, metaList, tableList, field, checkMap)
 	})
 
-	t.Run("mysql table as", func(t *testing.T) {
-		metaList := []string{
+	t.Run("mysql tag", func(t *testing.T) {
+		var metaList = []string{
 			gol.DatabaseTypeMysql,
 			gol.NamingConventionSnakeCase,
 			gol.NamingConventionSnakeCase,
 		}
-		{
-			tableList := []interface{}{"", &tableItem, "t1"}
-			var field interface{} = &tableItem.Name
-			checkMap := map[string]string{
-				"BaseSchema":          "",
-				"BaseTable":           "item",
-				"BaseAs":              "t1",
-				"BaseColumn":          "name",
-				"Schema":              "",
-				"Table":               "`item`",
-				"As":                  "`t1`",
-				"Column":              "`name`",
-				"TableColumn":         "`item`.`name`",
-				"TableAs":             "`t1`",
-				"TableAsColumn":       "`t1`.`name`",
-				"SchemaTable":         "`item`",
-				"SchemaTableColumn":   "`item`.`name`",
-				"SchemaTableAs":       "`t1`",
-				"SchemaTableAsColumn": "`t1`.`name`",
-			}
-			fn(t, metaList, tableList, field, checkMap)
+		var tableList = []interface{}{&tableTag, false}
+		var field interface{} = &tableTag.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          "PUBLIC",
+			"BaseTable":           "TAG",
+			"BaseAs":              "",
+			"BaseColumn":          "STR",
+			"Schema":              "`PUBLIC`",
+			"Table":               "`TAG`",
+			"As":                  "",
+			"Column":              "`STR`",
+			"TableColumn":         "`TAG`.`STR`",
+			"TableAs":             "`TAG`",
+			"TableAsColumn":       "`TAG`.`STR`",
+			"SchemaTable":         "`PUBLIC`.`TAG`",
+			"SchemaTableColumn":   "`PUBLIC`.`TAG`.`STR`",
+			"SchemaTableAs":       "`PUBLIC`.`TAG`",
+			"SchemaTableAsColumn": "`PUBLIC`.`TAG`.`STR`",
 		}
-		{
-			tableList := []interface{}{"", &tableTag, "t1"}
-			var field interface{} = &tableTag.Name
-			checkMap := map[string]string{
-				"BaseSchema":          "PUBLIC",
-				"BaseTable":           "TAG",
-				"BaseAs":              "t1",
-				"BaseColumn":          "NAME",
-				"Schema":              "`PUBLIC`",
-				"Table":               "`TAG`",
-				"As":                  "`t1`",
-				"Column":              "`NAME`",
-				"TableColumn":         "`TAG`.`NAME`",
-				"TableAs":             "`t1`",
-				"TableAsColumn":       "`t1`.`NAME`",
-				"SchemaTable":         "`PUBLIC`.`TAG`",
-				"SchemaTableColumn":   "`PUBLIC`.`TAG`.`NAME`",
-				"SchemaTableAs":       "`t1`",
-				"SchemaTableAsColumn": "`t1`.`NAME`",
-			}
-			fn(t, metaList, tableList, field, checkMap)
-		}
+		fn(t, metaList, tableList, field, checkMap)
 	})
 
-	t.Run("postgresql table", func(t *testing.T) {
-		metaList := []string{
+	t.Run("mysql item as", func(t *testing.T) {
+		var metaList = []string{
+			gol.DatabaseTypeMysql,
+			gol.NamingConventionSnakeCase,
+			gol.NamingConventionSnakeCase,
+		}
+		var tableList = []interface{}{&tableItem, true}
+		var field interface{} = &tableItem.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          "",
+			"BaseTable":           "item",
+			"BaseAs":              "t1",
+			"BaseColumn":          "str",
+			"Schema":              "",
+			"Table":               "`item`",
+			"As":                  "`t1`",
+			"Column":              "`str`",
+			"TableColumn":         "`item`.`str`",
+			"TableAs":             "`t1`",
+			"TableAsColumn":       "`t1`.`str`",
+			"SchemaTable":         "`item`",
+			"SchemaTableColumn":   "`item`.`str`",
+			"SchemaTableAs":       "`t1`",
+			"SchemaTableAsColumn": "`t1`.`str`",
+		}
+		fn(t, metaList, tableList, field, checkMap)
+	})
+
+	t.Run("mysql tag as", func(t *testing.T) {
+		var metaList = []string{
+			gol.DatabaseTypeMysql,
+			gol.NamingConventionSnakeCase,
+			gol.NamingConventionSnakeCase,
+		}
+		var tableList = []interface{}{&tableTag, true}
+		var field interface{} = &tableTag.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          "PUBLIC",
+			"BaseTable":           "TAG",
+			"BaseAs":              "t1",
+			"BaseColumn":          "STR",
+			"Schema":              "`PUBLIC`",
+			"Table":               "`TAG`",
+			"As":                  "`t1`",
+			"Column":              "`STR`",
+			"TableColumn":         "`TAG`.`STR`",
+			"TableAs":             "`t1`",
+			"TableAsColumn":       "`t1`.`STR`",
+			"SchemaTable":         "`PUBLIC`.`TAG`",
+			"SchemaTableColumn":   "`PUBLIC`.`TAG`.`STR`",
+			"SchemaTableAs":       "`t1`",
+			"SchemaTableAsColumn": "`t1`.`STR`",
+		}
+		fn(t, metaList, tableList, field, checkMap)
+	})
+
+	t.Run("postgresql item", func(t *testing.T) {
+		var metaList = []string{
 			gol.DatabaseTypePostgresql,
 			gol.NamingConventionSnakeCase,
 			gol.NamingConventionSnakeCase,
 		}
-		{
-			tableList := []interface{}{"", &tableItem, ""}
-			var field interface{} = &tableItem.Name
-			checkMap := map[string]string{
-				"BaseSchema":          ``,
-				"BaseTable":           `item`,
-				"BaseAs":              ``,
-				"BaseColumn":          `name`,
-				"Schema":              ``,
-				"Table":               `"item"`,
-				"As":                  ``,
-				"Column":              `"name"`,
-				"TableColumn":         `"item"."name"`,
-				"TableAs":             `"item"`,
-				"TableAsColumn":       `"item"."name"`,
-				"SchemaTable":         `"item"`,
-				"SchemaTableColumn":   `"item"."name"`,
-				"SchemaTableAs":       `"item"`,
-				"SchemaTableAsColumn": `"item"."name"`,
-			}
-			fn(t, metaList, tableList, field, checkMap)
+		var tableList = []interface{}{&tableItem, false}
+		var field interface{} = &tableItem.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          ``,
+			"BaseTable":           `item`,
+			"BaseAs":              ``,
+			"BaseColumn":          `str`,
+			"Schema":              ``,
+			"Table":               `"item"`,
+			"As":                  ``,
+			"Column":              `"str"`,
+			"TableColumn":         `"item"."str"`,
+			"TableAs":             `"item"`,
+			"TableAsColumn":       `"item"."str"`,
+			"SchemaTable":         `"item"`,
+			"SchemaTableColumn":   `"item"."str"`,
+			"SchemaTableAs":       `"item"`,
+			"SchemaTableAsColumn": `"item"."str"`,
 		}
-		{
-			tableList := []interface{}{"", &tableTag, ""}
-			var field interface{} = &tableTag.Name
-			checkMap := map[string]string{
-				"BaseSchema":          `PUBLIC`,
-				"BaseTable":           `TAG`,
-				"BaseAs":              ``,
-				"BaseColumn":          `NAME`,
-				"Schema":              `"PUBLIC"`,
-				"Table":               `"TAG"`,
-				"As":                  ``,
-				"Column":              `"NAME"`,
-				"TableColumn":         `"TAG"."NAME"`,
-				"TableAs":             `"TAG"`,
-				"TableAsColumn":       `"TAG"."NAME"`,
-				"SchemaTable":         `"PUBLIC"."TAG"`,
-				"SchemaTableColumn":   `"PUBLIC"."TAG"."NAME"`,
-				"SchemaTableAs":       `"PUBLIC"."TAG"`,
-				"SchemaTableAsColumn": `"PUBLIC"."TAG"."NAME"`,
-			}
-			fn(t, metaList, tableList, field, checkMap)
-		}
+		fn(t, metaList, tableList, field, checkMap)
 	})
 
-	t.Run("postgresql table as", func(t *testing.T) {
-		metaList := []string{
+	t.Run("postgresql tag", func(t *testing.T) {
+		var metaList = []string{
 			gol.DatabaseTypePostgresql,
 			gol.NamingConventionSnakeCase,
 			gol.NamingConventionSnakeCase,
 		}
-		{
-			tableList := []interface{}{"", &tableItem, "t1"}
-			var field interface{} = &tableItem.Name
-			checkMap := map[string]string{
-				"BaseSchema":          ``,
-				"BaseTable":           `item`,
-				"BaseAs":              `t1`,
-				"BaseColumn":          `name`,
-				"Schema":              ``,
-				"Table":               `"item"`,
-				"As":                  `"t1"`,
-				"Column":              `"name"`,
-				"TableColumn":         `"item"."name"`,
-				"TableAs":             `"t1"`,
-				"TableAsColumn":       `"t1"."name"`,
-				"SchemaTable":         `"item"`,
-				"SchemaTableColumn":   `"item"."name"`,
-				"SchemaTableAs":       `"t1"`,
-				"SchemaTableAsColumn": `"t1"."name"`,
-			}
-			fn(t, metaList, tableList, field, checkMap)
+		var tableList = []interface{}{&tableTag, false}
+		var field interface{} = &tableTag.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          `PUBLIC`,
+			"BaseTable":           `TAG`,
+			"BaseAs":              ``,
+			"BaseColumn":          `STR`,
+			"Schema":              `"PUBLIC"`,
+			"Table":               `"TAG"`,
+			"As":                  ``,
+			"Column":              `"STR"`,
+			"TableColumn":         `"TAG"."STR"`,
+			"TableAs":             `"TAG"`,
+			"TableAsColumn":       `"TAG"."STR"`,
+			"SchemaTable":         `"PUBLIC"."TAG"`,
+			"SchemaTableColumn":   `"PUBLIC"."TAG"."STR"`,
+			"SchemaTableAs":       `"PUBLIC"."TAG"`,
+			"SchemaTableAsColumn": `"PUBLIC"."TAG"."STR"`,
 		}
-		{
-			tableList := []interface{}{"", &tableTag, "t1"}
-			var field interface{} = &tableTag.Name
-			checkMap := map[string]string{
-				"BaseSchema":          `PUBLIC`,
-				"BaseTable":           `TAG`,
-				"BaseAs":              `t1`,
-				"BaseColumn":          `NAME`,
-				"Schema":              `"PUBLIC"`,
-				"Table":               `"TAG"`,
-				"As":                  `"t1"`,
-				"Column":              `"NAME"`,
-				"TableColumn":         `"TAG"."NAME"`,
-				"TableAs":             `"t1"`,
-				"TableAsColumn":       `"t1"."NAME"`,
-				"SchemaTable":         `"PUBLIC"."TAG"`,
-				"SchemaTableColumn":   `"PUBLIC"."TAG"."NAME"`,
-				"SchemaTableAs":       `"t1"`,
-				"SchemaTableAsColumn": `"t1"."NAME"`,
-			}
-			fn(t, metaList, tableList, field, checkMap)
-		}
+		fn(t, metaList, tableList, field, checkMap)
 	})
 
-	t.Run("postgresql schema table", func(t *testing.T) {
-		metaList := []string{
+	t.Run("postgresql item as", func(t *testing.T) {
+		var metaList = []string{
 			gol.DatabaseTypePostgresql,
 			gol.NamingConventionSnakeCase,
 			gol.NamingConventionSnakeCase,
 		}
-		{
-			tableList := []interface{}{"s1", &tableItem, ""}
-			var field interface{} = &tableItem.Name
-			checkMap := map[string]string{
-				"BaseSchema":          `s1`,
-				"BaseTable":           `item`,
-				"BaseAs":              ``,
-				"BaseColumn":          `name`,
-				"Schema":              `"s1"`,
-				"Table":               `"item"`,
-				"As":                  ``,
-				"Column":              `"name"`,
-				"TableColumn":         `"item"."name"`,
-				"TableAs":             `"item"`,
-				"TableAsColumn":       `"item"."name"`,
-				"SchemaTable":         `"s1"."item"`,
-				"SchemaTableColumn":   `"s1"."item"."name"`,
-				"SchemaTableAs":       `"s1"."item"`,
-				"SchemaTableAsColumn": `"s1"."item"."name"`,
-			}
-			fn(t, metaList, tableList, field, checkMap)
+		var tableList = []interface{}{&tableItem, true}
+		var field interface{} = &tableItem.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          ``,
+			"BaseTable":           `item`,
+			"BaseAs":              `t1`,
+			"BaseColumn":          `str`,
+			"Schema":              ``,
+			"Table":               `"item"`,
+			"As":                  `"t1"`,
+			"Column":              `"str"`,
+			"TableColumn":         `"item"."str"`,
+			"TableAs":             `"t1"`,
+			"TableAsColumn":       `"t1"."str"`,
+			"SchemaTable":         `"item"`,
+			"SchemaTableColumn":   `"item"."str"`,
+			"SchemaTableAs":       `"t1"`,
+			"SchemaTableAsColumn": `"t1"."str"`,
 		}
-		{
-			tableList := []interface{}{"s1", &tableTag, ""}
-			var field interface{} = &tableTag.Name
-			checkMap := map[string]string{
-				"BaseSchema":          `s1`,
-				"BaseTable":           `TAG`,
-				"BaseAs":              ``,
-				"BaseColumn":          `NAME`,
-				"Schema":              `"s1"`,
-				"Table":               `"TAG"`,
-				"As":                  ``,
-				"Column":              `"NAME"`,
-				"TableColumn":         `"TAG"."NAME"`,
-				"TableAs":             `"TAG"`,
-				"TableAsColumn":       `"TAG"."NAME"`,
-				"SchemaTable":         `"s1"."TAG"`,
-				"SchemaTableColumn":   `"s1"."TAG"."NAME"`,
-				"SchemaTableAs":       `"s1"."TAG"`,
-				"SchemaTableAsColumn": `"s1"."TAG"."NAME"`,
-			}
-			fn(t, metaList, tableList, field, checkMap)
-		}
+		fn(t, metaList, tableList, field, checkMap)
 	})
 
-	t.Run("postgresql schema table as", func(t *testing.T) {
-		metaList := []string{
+	t.Run("postgresql tag as", func(t *testing.T) {
+		var metaList = []string{
 			gol.DatabaseTypePostgresql,
 			gol.NamingConventionSnakeCase,
 			gol.NamingConventionSnakeCase,
 		}
-		{
-			tableList := []interface{}{"s1", &tableItem, "t1"}
-			var field interface{} = &tableItem.Name
-			checkMap := map[string]string{
-				"BaseSchema":          `s1`,
-				"BaseTable":           `item`,
-				"BaseAs":              `t1`,
-				"BaseColumn":          `name`,
-				"Schema":              `"s1"`,
-				"Table":               `"item"`,
-				"As":                  `"t1"`,
-				"Column":              `"name"`,
-				"TableColumn":         `"item"."name"`,
-				"TableAs":             `"t1"`,
-				"TableAsColumn":       `"t1"."name"`,
-				"SchemaTable":         `"s1"."item"`,
-				"SchemaTableColumn":   `"s1"."item"."name"`,
-				"SchemaTableAs":       `"t1"`,
-				"SchemaTableAsColumn": `"t1"."name"`,
-			}
-			fn(t, metaList, tableList, field, checkMap)
+		var tableList = []interface{}{&tableTag, true}
+		var field interface{} = &tableTag.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          `PUBLIC`,
+			"BaseTable":           `TAG`,
+			"BaseAs":              `t1`,
+			"BaseColumn":          `STR`,
+			"Schema":              `"PUBLIC"`,
+			"Table":               `"TAG"`,
+			"As":                  `"t1"`,
+			"Column":              `"STR"`,
+			"TableColumn":         `"TAG"."STR"`,
+			"TableAs":             `"t1"`,
+			"TableAsColumn":       `"t1"."STR"`,
+			"SchemaTable":         `"PUBLIC"."TAG"`,
+			"SchemaTableColumn":   `"PUBLIC"."TAG"."STR"`,
+			"SchemaTableAs":       `"t1"`,
+			"SchemaTableAsColumn": `"t1"."STR"`,
 		}
-		{
-			tableList := []interface{}{"s1", &tableTag, "t1"}
-			var field interface{} = &tableTag.Name
-			checkMap := map[string]string{
-				"BaseSchema":          `s1`,
-				"BaseTable":           `TAG`,
-				"BaseAs":              `t1`,
-				"BaseColumn":          `NAME`,
-				"Schema":              `"s1"`,
-				"Table":               `"TAG"`,
-				"As":                  `"t1"`,
-				"Column":              `"NAME"`,
-				"TableColumn":         `"TAG"."NAME"`,
-				"TableAs":             `"t1"`,
-				"TableAsColumn":       `"t1"."NAME"`,
-				"SchemaTable":         `"s1"."TAG"`,
-				"SchemaTableColumn":   `"s1"."TAG"."NAME"`,
-				"SchemaTableAs":       `"t1"`,
-				"SchemaTableAsColumn": `"t1"."NAME"`,
-			}
-			fn(t, metaList, tableList, field, checkMap)
-		}
+		fn(t, metaList, tableList, field, checkMap)
 	})
 }

@@ -237,135 +237,32 @@ func (rec *Query) SetClient(client *Client) {
 }
 
 func (rec *Query) AddMeta(tablePtr interface{}) {
-	rec.Value.AddMeta("", tablePtr, "")
-}
-
-func (rec *Query) AddMetaAs(tablePtr interface{}, alias string) {
-	rec.Value.AddMeta("", tablePtr, alias)
-}
-
-func (rec *Query) AddMetaSchema(schema string, tablePtr interface{}) {
-	rec.Value.AddMeta(schema, tablePtr, "")
-}
-
-func (rec *Query) AddMetaAsSchema(schema string, tablePtr interface{}, alias string) {
-	rec.Value.AddMeta(schema, tablePtr, alias)
+	rec.Value.AddMeta(tablePtr, true)
 }
 
 func (rec *Query) SetTable(tablePtr interface{}) {
-	rec.Value.AddMeta("", tablePtr, "")
+	rec.Value.AddMeta(tablePtr, true)
 	rec.Value.SetTable(QueryModeDefault, tablePtr)
 }
 
-func (rec *Query) SetTableAs(tablePtr interface{}, tableAs string) {
-	rec.Value.AddMeta("", tablePtr, tableAs)
-	rec.Value.SetTable(QueryModeDefault, tablePtr)
-}
-
-func (rec *Query) SetTableWithSchema(schema string, tablePtr interface{}) {
-	rec.Value.AddMeta(schema, tablePtr, "")
-	rec.Value.SetTable(QueryModeDefault, tablePtr)
-}
-
-func (rec *Query) SetTableAsWithSchema(schema string, tablePtr interface{}, tableAs string) {
-	rec.Value.AddMeta(schema, tablePtr, tableAs)
-	rec.Value.SetTable(QueryModeDefault, tablePtr)
+func (rec *Query) SetFrom(tablePtr interface{}, valueList ...interface{}) {
+	rec.Value.AddMeta(tablePtr, true)
+	rec.Value.AddFrom(QueryModeDefault, tablePtr, valueList...)
 }
 
 func (rec *Query) SetJoin(tablePtr interface{}, valueList ...interface{}) {
-	rec.Value.AddMeta("", tablePtr, "")
+	rec.Value.AddMeta(tablePtr, true)
 	rec.Value.AddJoin(QueryJoinModeInner, tablePtr)
-	if len(valueList) > 0 {
-		rec.Value.AddJoinWhere(QueryModeDefault, QueryPrefixAnd, tablePtr, valueList...)
-	}
-}
-
-func (rec *Query) SetJoinWithSchema(schema string, tablePtr interface{}, valueList ...interface{}) {
-	rec.Value.AddMeta(schema, tablePtr, "")
-	rec.Value.AddJoin(QueryJoinModeInner, tablePtr)
-	if len(valueList) > 0 {
-		rec.Value.AddJoinWhere(QueryModeDefault, QueryPrefixAnd, tablePtr, valueList...)
-	}
-}
-
-func (rec *Query) SetJoinAs(tablePtr interface{}, tableAs string, valueList ...interface{}) {
-	rec.Value.AddMeta("", tablePtr, tableAs)
-	rec.Value.AddJoin(QueryJoinModeInner, tablePtr)
-	if len(valueList) > 0 {
-		rec.Value.AddJoinWhere(QueryModeDefault, QueryPrefixAnd, tablePtr, valueList...)
-	}
-}
-
-func (rec *Query) SetJoinAsWithSchema(schema string, tablePtr interface{}, tableAs string, valueList ...interface{}) {
-	rec.Value.AddMeta(schema, tablePtr, tableAs)
-	rec.Value.AddJoin(QueryJoinModeInner, tablePtr)
-	if len(valueList) > 0 {
-		rec.Value.AddJoinWhere(QueryModeDefault, QueryPrefixAnd, tablePtr, valueList...)
-	}
 }
 
 func (rec *Query) SetJoinLeft(tablePtr interface{}, valueList ...interface{}) {
-	rec.Value.AddMeta("", tablePtr, "")
+	rec.Value.AddMeta(tablePtr, true)
 	rec.Value.AddJoin(QueryJoinModeLeft, tablePtr)
-	if len(valueList) > 0 {
-		rec.Value.AddJoinWhere(QueryModeDefault, QueryPrefixAnd, tablePtr, valueList...)
-	}
-}
-
-func (rec *Query) SetJoinLeftWithSchema(schema string, tablePtr interface{}, valueList ...interface{}) {
-	rec.Value.AddMeta(schema, tablePtr, "")
-	rec.Value.AddJoin(QueryJoinModeLeft, tablePtr)
-	if len(valueList) > 0 {
-		rec.Value.AddJoinWhere(QueryModeDefault, QueryPrefixAnd, tablePtr, valueList...)
-	}
-}
-
-func (rec *Query) SetJoinLeftAs(tablePtr interface{}, tableAs string, valueList ...interface{}) {
-	rec.Value.AddMeta("", tablePtr, tableAs)
-	rec.Value.AddJoin(QueryJoinModeLeft, tablePtr)
-	if len(valueList) > 0 {
-		rec.Value.AddJoinWhere(QueryModeDefault, QueryPrefixAnd, tablePtr, valueList...)
-	}
-}
-
-func (rec *Query) SetJoinLeftAsWithSchema(schema string, tablePtr interface{}, tableAs string, valueList ...interface{}) {
-	rec.Value.AddMeta(schema, tablePtr, tableAs)
-	rec.Value.AddJoin(QueryJoinModeLeft, tablePtr)
-	if len(valueList) > 0 {
-		rec.Value.AddJoinWhere(QueryModeDefault, QueryPrefixAnd, tablePtr, valueList...)
-	}
 }
 
 func (rec *Query) SetJoinRight(tablePtr interface{}, valueList ...interface{}) {
-	rec.Value.AddMeta("", tablePtr, "")
+	rec.Value.AddMeta(tablePtr, true)
 	rec.Value.AddJoin(QueryJoinModeRight, tablePtr)
-	if len(valueList) > 0 {
-		rec.Value.AddJoinWhere(QueryModeDefault, QueryPrefixAnd, tablePtr, valueList...)
-	}
-}
-
-func (rec *Query) SetJoinRightWithSchema(schema string, tablePtr interface{}, valueList ...interface{}) {
-	rec.Value.AddMeta(schema, tablePtr, "")
-	rec.Value.AddJoin(QueryJoinModeRight, tablePtr)
-	if len(valueList) > 0 {
-		rec.Value.AddJoinWhere(QueryModeDefault, QueryPrefixAnd, tablePtr, valueList...)
-	}
-}
-
-func (rec *Query) SetJoinRightAs(tablePtr interface{}, tableAs string, valueList ...interface{}) {
-	rec.Value.AddMeta("", tablePtr, tableAs)
-	rec.Value.AddJoin(QueryJoinModeRight, tablePtr)
-	if len(valueList) > 0 {
-		rec.Value.AddJoinWhere(QueryModeDefault, QueryPrefixAnd, tablePtr, valueList...)
-	}
-}
-
-func (rec *Query) SetJoinRightAsWithSchema(schema string, tablePtr interface{}, tableAs string, valueList ...interface{}) {
-	rec.Value.AddMeta(schema, tablePtr, tableAs)
-	rec.Value.AddJoin(QueryJoinModeRight, tablePtr)
-	if len(valueList) > 0 {
-		rec.Value.AddJoinWhere(QueryModeDefault, QueryPrefixAnd, tablePtr, valueList...)
-	}
 }
 
 func (rec *Query) SetJoinWhere(tablePtr interface{}, valueList ...interface{}) {

@@ -24,6 +24,7 @@ type QueryValue struct {
 	ErrorList        []error
 	Meta             *Meta
 	Table            *QueryTable
+	FromList         []*QueryFrom
 	JoinList         []*QueryJoin
 	JoinWhereList    []*QueryJoinWhere
 	ValuesColumnList []*QueryValuesColumn
@@ -39,137 +40,153 @@ type QueryValue struct {
 }
 
 func (rec *QueryValue) GetInsertQuery() (string, []interface{}, error) {
-	query := "INSERT"
+	var query = "INSERT"
 	var valueList []interface{}
 
-	{
-		str, err := rec.BuildTable()
-		if err != nil {
-			return "", nil, err
+	err := func() error {
+		{
+			str, err := rec.BuildTable()
+			if err != nil {
+				return err
+			}
+			if str == "" {
+				return errors.New("table not exist")
+			}
+			query = fmt.Sprintf("%v INTO %v", query, str)
 		}
-		if str == "" {
-			return "", nil, errors.New("table not exist")
-		}
-		query = fmt.Sprintf("%v INTO %v", query, str)
-	}
 
-	{
-		str, err := rec.BuildValuesColumn()
-		if err != nil {
-			return "", nil, err
+		{
+			str, err := rec.BuildValuesColumn()
+			if err != nil {
+				return err
+			}
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
 		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-		}
-	}
 
-	{
-		str, valList, err := rec.BuildValues()
-		if err != nil {
-			return "", nil, err
+		{
+			str, valList, err := rec.BuildValues()
+			if err != nil {
+				return err
+			}
+			if str == "" {
+				return errors.New("values not exist")
+			}
+			query = fmt.Sprintf("%v VALUES %v", query, str)
+			valueList = append(valueList, valList...)
 		}
-		if str == "" {
-			return "", nil, errors.New("values not exist")
-		}
-		query = fmt.Sprintf("%v VALUES %v", query, str)
-		valueList = append(valueList, valList...)
-	}
 
-	return query, valueList, nil
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValue) GetUpdateQuery() (string, []interface{}, error) {
-	query := "UPDATE"
+	var query = "UPDATE"
 	var valueList []interface{}
 
-	{
-		str, err := rec.BuildTable()
-		if err != nil {
-			return "", nil, err
+	err := func() error {
+		{
+			str, err := rec.BuildTable()
+			if err != nil {
+				return err
+			}
+			if str == "" {
+				return errors.New("table not exist")
+			}
+			query = fmt.Sprintf("%v %v", query, str)
 		}
-		if str == "" {
-			return "", nil, errors.New("table not exist")
-		}
-		query = fmt.Sprintf("%v %v", query, str)
-	}
 
-	{
-		str, valList, err := rec.BuildSet()
-		if err != nil {
-			return "", nil, err
-		}
-		if str == "" {
-			return "", nil, errors.New("set not exist")
-		}
-		query = fmt.Sprintf("%v %v", query, str)
-		valueList = append(valueList, valList...)
-	}
-
-	{
-		str, valList, err := rec.BuildWhere()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
+		{
+			str, valList, err := rec.BuildSet()
+			if err != nil {
+				return err
+			}
+			if str == "" {
+				return errors.New("set not exist")
+			}
 			query = fmt.Sprintf("%v %v", query, str)
 			valueList = append(valueList, valList...)
 		}
-	}
 
-	return query, valueList, nil
+		{
+			str, valList, err := rec.BuildWhere()
+			if err != nil {
+				return err
+			}
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+				valueList = append(valueList, valList...)
+			}
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValue) GetDeleteQuery() (string, []interface{}, error) {
-	query := "DELETE"
+	var query = "DELETE"
 	var valueList []interface{}
 
-	{
-		str, err := rec.BuildTable()
-		if err != nil {
-			return "", nil, err
+	err := func() error {
+		{
+			str, err := rec.BuildTable()
+			if err != nil {
+				return err
+			}
+			if str == "" {
+				return errors.New("table not exist")
+			}
+			query = fmt.Sprintf("%v FROM %v", query, str)
 		}
-		if str == "" {
-			return "", nil, errors.New("table not exist")
-		}
-		query = fmt.Sprintf("%v FROM %v", query, str)
-	}
 
-	{
-		str, valList, err := rec.BuildWhere()
-		if err != nil {
-			return "", nil, err
+		{
+			str, valList, err := rec.BuildWhere()
+			if err != nil {
+				return err
+			}
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+				valueList = append(valueList, valList...)
+			}
 		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-			valueList = append(valueList, valList...)
-		}
-	}
 
-	return query, valueList, nil
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValue) GetTruncateQuery() (string, []interface{}, error) {
-	query := "TRUNCATE TABLE"
+	var query = "TRUNCATE TABLE"
 	var valueList []interface{}
 
-	{
+	err := func() error {
 		str, err := rec.BuildTable()
 		if err != nil {
-			return "", nil, err
+			return err
 		}
-		if str == "" {
-			return "", nil, errors.New("table not exist")
-		}
-		query = fmt.Sprintf("%v %v", query, str)
-	}
 
-	return query, valueList, nil
+		if str == "" {
+			return errors.New("table not exist")
+		}
+
+		query = fmt.Sprintf("%v %v", query, str)
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValue) GetTruncateRestartIdentityQuery() (string, []interface{}, error) {
 	query, valueList, err := rec.GetTruncateQuery()
 	if err != nil {
-		return "", nil, err
+		return query, valueList, err
 	}
 
 	query = fmt.Sprintf("%v RESTART IDENTITY", query)
@@ -181,194 +198,300 @@ func (rec *QueryValue) GetSelectQuery() (string, []interface{}, error) {
 	var query string
 	var valueList []interface{}
 
-	{
-		str, valList, err := rec.BuildSelectUseAs()
-		if err != nil {
-			return "", nil, err
+	err := func() error {
+		if rec.Table == nil && len(rec.FromList) < 1 {
+			return errors.New("table not exist")
 		}
-		if str == "" {
-			return "", nil, errors.New("select not exist")
-		}
-		query = str
-		valueList = append(valueList, valList...)
-	}
 
-	{
-		str, err := rec.BuildTableUseAs()
-		if err != nil {
-			return "", nil, err
+		fnBuildSelect := rec.BuildSelect
+		fnBuildTable := rec.BuildTable
+		fnBuildWhere := rec.BuildWhere
+		fnBuildGroupBy := rec.BuildGroupBy
+		fnBuildHaving := rec.BuildHaving
+		fnBuildOrderBy := rec.BuildOrderBy
+		if len(rec.FromList) > 1 || len(rec.JoinList) > 0 {
+			fnBuildSelect = rec.BuildSelectUseAs
+			fnBuildTable = rec.BuildTableUseAs
+			fnBuildWhere = rec.BuildWhereUseAs
+			fnBuildGroupBy = rec.BuildGroupByUseAs
+			fnBuildHaving = rec.BuildHavingUseAs
+			fnBuildOrderBy = rec.BuildOrderByUseAs
 		}
-		if str == "" {
-			return "", nil, errors.New("table not exist")
-		}
-		query = fmt.Sprintf("%v FROM %v", query, str)
-	}
 
-	{
-		str, valList, err := rec.BuildJoinUseAs()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
+		{
+			str, valList, err := fnBuildSelect()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("select not exist")
+			}
+
+			query = str
 			valueList = append(valueList, valList...)
 		}
-	}
 
-	{
-		str, valList, err := rec.BuildWhereUseAs()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-			valueList = append(valueList, valList...)
-		}
-	}
+		{
+			var strList []string
+			{
+				str, err := fnBuildTable()
+				if err != nil {
+					return err
+				}
 
-	{
-		str, err := rec.BuildGroupByUseAs()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-		}
-	}
+				if str != "" {
+					strList = append(strList, str)
+				}
+			}
 
-	{
-		str, valList, err := rec.BuildHavingUseAs()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-			valueList = append(valueList, valList...)
-		}
-	}
+			{
+				str, valList, err := rec.BuildFromUseAs()
+				if err != nil {
+					return err
+				}
 
-	{
-		str, err := rec.BuildOrderByUseAs()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-		}
-	}
+				if str != "" {
+					strList = append(strList, str)
+				}
 
-	{
-		str, err := rec.BuildLimit()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-		}
-	}
+				valueList = append(valueList, valList...)
+			}
 
-	{
-		str, err := rec.BuildOffset()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-		}
-	}
+			if len(strList) < 1 {
+				return errors.New("from not exist")
+			}
 
-	return query, valueList, nil
+			str := strings.Join(strList, ", ")
+			query = fmt.Sprintf("%v FROM %v", query, str)
+		}
+
+		{
+			str, valList, err := rec.BuildJoinUseAs()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+				valueList = append(valueList, valList...)
+			}
+		}
+
+		{
+			str, valList, err := fnBuildWhere()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+				valueList = append(valueList, valList...)
+			}
+		}
+
+		{
+			str, err := fnBuildGroupBy()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, valList, err := fnBuildHaving()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+				valueList = append(valueList, valList...)
+			}
+		}
+
+		{
+			str, err := fnBuildOrderBy()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, err := rec.BuildLimit()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, err := rec.BuildOffset()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValue) GetSelectCountQuery() (string, []interface{}, error) {
-	query := "SELECT count(*) as count"
+	var query = "SELECT count(*) as count"
 	var valueList []interface{}
 
-	{
-		str, err := rec.BuildTableUseAs()
-		if err != nil {
-			return "", nil, err
+	err := func() error {
+		if rec.Table == nil && len(rec.FromList) < 1 {
+			return errors.New("table not exist")
 		}
-		if str == "" {
-			return "", nil, errors.New("table not exist")
-		}
-		query = fmt.Sprintf("%v FROM %v", query, str)
-	}
 
-	{
-		str, valList, err := rec.BuildJoinUseAs()
-		if err != nil {
-			return "", nil, err
+		fnBuildTable := rec.BuildTable
+		fnBuildWhere := rec.BuildWhere
+		fnBuildGroupBy := rec.BuildGroupBy
+		fnBuildHaving := rec.BuildHaving
+		fnBuildOrderBy := rec.BuildOrderBy
+		if len(rec.FromList) > 1 || len(rec.JoinList) > 0 {
+			fnBuildTable = rec.BuildTableUseAs
+			fnBuildWhere = rec.BuildWhereUseAs
+			fnBuildGroupBy = rec.BuildGroupByUseAs
+			fnBuildHaving = rec.BuildHavingUseAs
+			fnBuildOrderBy = rec.BuildOrderByUseAs
 		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-			valueList = append(valueList, valList...)
-		}
-	}
 
-	{
-		str, valList, err := rec.BuildWhereUseAs()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-			valueList = append(valueList, valList...)
-		}
-	}
+		{
+			var strList []string
+			{
+				str, err := fnBuildTable()
+				if err != nil {
+					return err
+				}
 
-	{
-		str, err := rec.BuildGroupByUseAs()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-		}
-	}
+				if str != "" {
+					strList = append(strList, str)
+				}
+			}
 
-	{
-		str, valList, err := rec.BuildHavingUseAs()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-			valueList = append(valueList, valList...)
-		}
-	}
+			{
+				str, valList, err := rec.BuildFromUseAs()
+				if err != nil {
+					return err
+				}
 
-	{
-		str, err := rec.BuildOrderByUseAs()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-		}
-	}
+				if str != "" {
+					strList = append(strList, str)
+				}
 
-	{
-		str, err := rec.BuildLimit()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-		}
-	}
+				valueList = append(valueList, valList...)
+			}
 
-	{
-		str, err := rec.BuildOffset()
-		if err != nil {
-			return "", nil, err
-		}
-		if str != "" {
-			query = fmt.Sprintf("%v %v", query, str)
-		}
-	}
+			if len(strList) < 1 {
+				return errors.New("from not exist")
+			}
 
-	return query, valueList, nil
+			str := strings.Join(strList, ", ")
+			query = fmt.Sprintf("%v FROM %v", query, str)
+		}
+
+		{
+			str, valList, err := rec.BuildJoinUseAs()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+				valueList = append(valueList, valList...)
+			}
+		}
+
+		{
+			str, valList, err := fnBuildWhere()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+				valueList = append(valueList, valList...)
+			}
+		}
+
+		{
+			str, err := fnBuildGroupBy()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, valList, err := fnBuildHaving()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+				valueList = append(valueList, valList...)
+			}
+		}
+
+		{
+			str, err := fnBuildOrderBy()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, err := rec.BuildLimit()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, err := rec.BuildOffset()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValue) GetValuesCount() int {
@@ -389,274 +512,495 @@ func (rec *QueryValue) BuildTableUseAs() (string, error) {
 	return rec.Table.BuildUseAs(rec.Meta)
 }
 
-func (rec *QueryValue) BuildJoinUseAs() (string, []interface{}, error) {
+func (rec *QueryValue) BuildFromUseAs() (string, []interface{}, error) {
 	var query string
 	var valueList []interface{}
-	{
+
+	err := func() error {
 		var strList []string
-		for _, val := range rec.JoinList {
-			str, err := val.BuildUseAs(rec.Meta)
+		for _, val := range rec.FromList {
+			str, valList, err := val.BuildUseAs(rec.Meta)
 			if err != nil {
-				return "", nil, err
+				return err
 			}
-
-			where, valList, err := rec.BuildJoinWhereUseAs(val.TablePtr)
-			if err != nil {
-				return "", nil, err
-			}
-
-			str = fmt.Sprintf("%v %v", str, where)
 
 			strList = append(strList, str)
 			valueList = append(valueList, valList...)
 		}
+
+		if len(strList) > 0 {
+			query = strings.Join(strList, ", ")
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
+func (rec *QueryValue) BuildJoinUseAs() (string, []interface{}, error) {
+	var query string
+	var valueList []interface{}
+
+	err := func() error {
+		if len(rec.JoinList) < 1 {
+			return nil
+		}
+
+		var strList []string
+		for _, val := range rec.JoinList {
+			str, valList, err := val.BuildUseAs(rec.Meta)
+			if err != nil {
+				return err
+			}
+
+			valueList = append(valueList, valList...)
+
+			where, valList, err := rec.BuildJoinWhereUseAs(val.TablePtr)
+			if err != nil {
+				return err
+			}
+
+			str = fmt.Sprintf("%v %v", str, where)
+			strList = append(strList, str)
+			valueList = append(valueList, valList...)
+		}
+
 		if len(strList) > 0 {
 			query = strings.Join(strList, " ")
 		}
-	}
-	return query, valueList, nil
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValue) BuildJoinWhereUseAs(tablePtr interface{}) (string, []interface{}, error) {
 	var query string
 	var valueList []interface{}
-	{
+
+	err := func() error {
 		var strList []string
-		flg := false
+		var flg = false
 		for _, val := range rec.JoinWhereList {
 			if tablePtr != val.TablePtr {
 				continue
 			}
+
 			prefix, str, valList, err := val.BuildUseAs(rec.Meta)
 			if err != nil {
-				return "", nil, err
+				return err
 			}
+
 			if flg && val.Mode != QueryModeNestClose {
 				strList = append(strList, prefix, str)
 			} else {
 				strList = append(strList, str)
 				flg = true
 			}
+
 			valueList = append(valueList, valList...)
+
 			if val.Mode == QueryModeNest {
 				flg = false
 			}
 		}
+
 		if len(strList) < 1 {
-			return "", nil, errors.New("joinWhere not exist")
+			return errors.New("joinWhere not exist")
 		}
+
 		query = strings.Join(strList, " ")
-	}
-	return query, valueList, nil
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValue) BuildValuesColumn() (string, error) {
 	var query string
-	{
+
+	err := func() error {
 		var strList []string
 		for _, val := range rec.ValuesColumnList {
 			str, err := val.Build(rec.Meta)
 			if err != nil {
-				return "", err
+				return err
 			}
+
 			strList = append(strList, str)
 		}
+
 		if len(strList) > 0 {
 			query = strings.Join(strList, ", ")
 			query = fmt.Sprintf("(%v)", query)
 		}
-	}
-	return query, nil
+
+		return nil
+	}()
+
+	return query, err
 }
 
 func (rec *QueryValue) BuildValues() (string, []interface{}, error) {
 	var query string
 	var valueList []interface{}
-	{
+
+	err := func() error {
 		var strList []string
 		for _, val := range rec.ValuesList {
 			str, valList, err := val.Build(rec.Meta)
 			if err != nil {
-				return "", nil, err
+				return err
 			}
+
 			strList = append(strList, str)
 			valueList = append(valueList, valList...)
 		}
+
 		if len(strList) > 0 {
 			query = strings.Join(strList, ", ")
 		}
-	}
-	return query, valueList, nil
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValue) BuildSet() (string, []interface{}, error) {
 	var query string
 	var valueList []interface{}
-	{
+
+	err := func() error {
 		var strList []string
 		for _, val := range rec.SetList {
 			str, value, err := val.Build(rec.Meta)
 			if err != nil {
-				return "", nil, err
+				return err
 			}
+
 			strList = append(strList, str)
 			valueList = append(valueList, value)
 		}
+
 		if len(strList) > 0 {
 			query = strings.Join(strList, ", ")
 			query = fmt.Sprintf("SET %v", query)
 		}
-	}
-	return query, valueList, nil
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
+func (rec *QueryValue) BuildSelect() (string, []interface{}, error) {
+	var query string
+	var valueList []interface{}
+
+	err := func() error {
+		var strList []string
+		for _, val := range rec.SelectList {
+			str, valList, err := val.Build(rec.Meta)
+			if err != nil {
+				return err
+			}
+
+			strList = append(strList, str)
+			valueList = append(valueList, valList...)
+		}
+
+		if len(strList) > 0 {
+			query = strings.Join(strList, ", ")
+			query = fmt.Sprintf("SELECT %v", query)
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValue) BuildSelectUseAs() (string, []interface{}, error) {
 	var query string
 	var valueList []interface{}
-	{
+
+	err := func() error {
 		var strList []string
 		for _, val := range rec.SelectList {
 			str, valList, err := val.BuildUseAs(rec.Meta)
 			if err != nil {
-				return "", nil, err
+				return err
 			}
+
 			strList = append(strList, str)
 			valueList = append(valueList, valList...)
 		}
+
 		if len(strList) > 0 {
 			query = strings.Join(strList, ", ")
 			query = fmt.Sprintf("SELECT %v", query)
 		}
-	}
-	return query, valueList, nil
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValue) BuildWhere() (string, []interface{}, error) {
 	var query string
 	var valueList []interface{}
-	{
+
+	err := func() error {
 		var strList []string
-		flg := false
+		var flg = false
 		for _, val := range rec.WhereList {
 			prefix, str, valList, err := val.Build(rec.Meta)
 			if err != nil {
-				return "", nil, err
+				return err
 			}
+
 			if flg && val.Mode != QueryModeNestClose {
 				strList = append(strList, prefix, str)
 			} else {
 				strList = append(strList, str)
 				flg = true
 			}
+
 			valueList = append(valueList, valList...)
+
 			if val.Mode == QueryModeNest {
 				flg = false
 			}
 		}
+
 		if len(strList) > 0 {
 			query = strings.Join(strList, " ")
 			query = fmt.Sprintf("WHERE %v", query)
 		}
-	}
-	return query, valueList, nil
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValue) BuildWhereUseAs() (string, []interface{}, error) {
 	var query string
 	var valueList []interface{}
-	{
+
+	err := func() error {
 		var strList []string
-		flg := false
+		var flg = false
 		for _, val := range rec.WhereList {
 			prefix, str, valList, err := val.BuildUseAs(rec.Meta)
 			if err != nil {
-				return "", nil, err
+				return err
 			}
+
 			if flg && val.Mode != QueryModeNestClose {
 				strList = append(strList, prefix, str)
 			} else {
 				strList = append(strList, str)
 				flg = true
 			}
+
 			valueList = append(valueList, valList...)
+
 			if val.Mode == QueryModeNest {
 				flg = false
 			}
 		}
+
 		if len(strList) > 0 {
 			query = strings.Join(strList, " ")
 			query = fmt.Sprintf("WHERE %v", query)
 		}
-	}
-	return query, valueList, nil
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
-func (rec *QueryValue) BuildGroupByUseAs() (string, error) {
+func (rec *QueryValue) BuildGroupBy() (string, error) {
 	var query string
-	{
+
+	err := func() error {
 		var strList []string
 		for _, val := range rec.GroupByList {
-			str, err := val.BuildUseAs(rec.Meta)
+			str, err := val.Build(rec.Meta)
 			if err != nil {
-				return "", err
+				return err
 			}
+
 			strList = append(strList, str)
 		}
+
 		if len(strList) > 0 {
 			query = strings.Join(strList, ", ")
 			query = fmt.Sprintf("GROUP BY %v", query)
 		}
-	}
-	return query, nil
+
+		return nil
+	}()
+
+	return query, err
+}
+
+func (rec *QueryValue) BuildGroupByUseAs() (string, error) {
+	var query string
+
+	err := func() error {
+		var strList []string
+		for _, val := range rec.GroupByList {
+			str, err := val.BuildUseAs(rec.Meta)
+			if err != nil {
+				return err
+			}
+
+			strList = append(strList, str)
+		}
+
+		if len(strList) > 0 {
+			query = strings.Join(strList, ", ")
+			query = fmt.Sprintf("GROUP BY %v", query)
+		}
+
+		return nil
+	}()
+
+	return query, err
+}
+
+func (rec *QueryValue) BuildHaving() (string, []interface{}, error) {
+	var query string
+	var valueList []interface{}
+
+	err := func() error {
+		var strList []string
+		var flg = false
+		for _, val := range rec.HavingList {
+			prefix, str, valList, err := val.Build(rec.Meta)
+			if err != nil {
+				return err
+			}
+
+			if flg && val.Mode != QueryModeNestClose {
+				strList = append(strList, prefix, str)
+			} else {
+				strList = append(strList, str)
+				flg = true
+			}
+
+			valueList = append(valueList, valList...)
+
+			if val.Mode == QueryModeNest {
+				flg = false
+			}
+		}
+
+		if len(strList) > 0 {
+			query = strings.Join(strList, " ")
+			query = fmt.Sprintf("HAVING %v", query)
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValue) BuildHavingUseAs() (string, []interface{}, error) {
 	var query string
 	var valueList []interface{}
-	{
+
+	err := func() error {
 		var strList []string
-		flg := false
+		var flg = false
 		for _, val := range rec.HavingList {
 			prefix, str, valList, err := val.BuildUseAs(rec.Meta)
 			if err != nil {
-				return "", nil, err
+				return err
 			}
+
 			if flg && val.Mode != QueryModeNestClose {
 				strList = append(strList, prefix, str)
 			} else {
 				strList = append(strList, str)
 				flg = true
 			}
+
 			valueList = append(valueList, valList...)
+
 			if val.Mode == QueryModeNest {
 				flg = false
 			}
 		}
+
 		if len(strList) > 0 {
 			query = strings.Join(strList, " ")
 			query = fmt.Sprintf("HAVING %v", query)
 		}
-	}
-	return query, valueList, nil
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
-func (rec *QueryValue) BuildOrderByUseAs() (string, error) {
+func (rec *QueryValue) BuildOrderBy() (string, error) {
 	var query string
-	{
+
+	err := func() error {
 		var strList []string
 		for _, val := range rec.OrderByList {
-			str, err := val.BuildUseAs(rec.Meta)
+			str, err := val.Build(rec.Meta)
 			if err != nil {
-				return "", err
+				return err
 			}
+
 			strList = append(strList, str)
 		}
+
 		if len(strList) > 0 {
 			query = strings.Join(strList, ", ")
 			query = fmt.Sprintf("ORDER BY %v", query)
 		}
-	}
-	return query, nil
+
+		return nil
+	}()
+
+	return query, err
+}
+
+func (rec *QueryValue) BuildOrderByUseAs() (string, error) {
+	var query string
+
+	err := func() error {
+		var strList []string
+		for _, val := range rec.OrderByList {
+			str, err := val.BuildUseAs(rec.Meta)
+			if err != nil {
+				return err
+			}
+
+			strList = append(strList, str)
+		}
+
+		if len(strList) > 0 {
+			query = strings.Join(strList, ", ")
+			query = fmt.Sprintf("ORDER BY %v", query)
+		}
+
+		return nil
+	}()
+
+	return query, err
 }
 
 func (rec *QueryValue) BuildLimit() (string, error) {
@@ -675,22 +1019,28 @@ func (rec *QueryValue) BuildOffset() (string, error) {
 	return query, nil
 }
 
-func (rec *QueryValue) AddMeta(schema string, tablePtr interface{}, as string) {
-	err := rec.Meta.Add(schema, tablePtr, as)
+func (rec *QueryValue) AddMeta(tablePtr interface{}, useAs bool) {
+	err := rec.Meta.Add(tablePtr, useAs)
 	if err != nil {
 		rec.ErrorList = append(rec.ErrorList, err)
 	}
 }
 
-func (rec *QueryValue) SetTable(mode int, valueList ...interface{}) {
+func (rec *QueryValue) SetTable(mode int, tablePtr interface{}) {
 	data := &QueryTable{}
-	data.Set(mode, valueList...)
+	data.Set(mode, tablePtr)
 	rec.Table = data
 }
 
-func (rec *QueryValue) AddJoin(mode int, tablePtr interface{}) {
+func (rec *QueryValue) AddFrom(mode int, tablePtr interface{}, valueList ...interface{}) {
+	data := &QueryFrom{}
+	data.Set(mode, tablePtr, valueList...)
+	rec.FromList = append(rec.FromList, data)
+}
+
+func (rec *QueryValue) AddJoin(mode int, tablePtr interface{}, valueList ...interface{}) {
 	data := &QueryJoin{}
-	data.Set(mode, tablePtr)
+	data.Set(mode, tablePtr, valueList...)
 	rec.JoinList = append(rec.JoinList, data)
 }
 
@@ -761,84 +1111,184 @@ func (rec *QueryValue) SetOffset(value int) {
 }
 
 type QueryTable struct {
-	Mode      int
-	ValueList []interface{}
-}
-
-func (rec *QueryTable) Build(meta *Meta) (string, error) {
-	if len(rec.ValueList) != 1 {
-		return "", errors.New(fmt.Sprintf("table length must be 1"))
-	}
-
-	data := meta.Get(rec.ValueList[0])
-	if data == nil {
-		return "", errors.New("table meta not exist")
-	}
-
-	query := data.SchemaTable
-
-	return query, nil
-}
-
-func (rec *QueryTable) BuildUseAs(meta *Meta) (string, error) {
-	if len(rec.ValueList) != 1 {
-		return "", errors.New(fmt.Sprintf("table length must be 1"))
-	}
-
-	data := meta.Get(rec.ValueList[0])
-	if data == nil {
-		return "", errors.New("table meta not exist")
-	}
-
-	query := data.SchemaTable
-	if data.As != "" {
-		query = fmt.Sprintf("%v as %v", query, data.As)
-	}
-
-	return query, nil
-}
-
-func (rec *QueryTable) Set(mode int, valueList ...interface{}) {
-	rec.Mode = mode
-	rec.ValueList = valueList
-}
-
-type QueryJoin struct {
 	Mode     int
 	TablePtr interface{}
 }
 
-func (rec *QueryJoin) BuildUseAs(meta *Meta) (string, error) {
-	var prefix string
-	switch rec.Mode {
-	case QueryJoinModeInner:
-		prefix = "INNER"
-	case QueryJoinModeLeft:
-		prefix = "LEFT"
-	case QueryJoinModeRight:
-		prefix = "RIGHT"
-	default:
-		return "", errors.New("join mode not exist")
-	}
+func (rec *QueryTable) Build(meta *Meta) (string, error) {
+	var query string
 
-	data := meta.Get(rec.TablePtr)
-	if data == nil {
-		return "", errors.New("join meta not exist")
-	}
+	err := func() error {
+		data := meta.Get(rec.TablePtr)
+		if data == nil {
+			return errors.New("table meta not exist")
+		}
 
-	table := data.SchemaTable
-	if data.As != "" {
-		table = fmt.Sprintf("%v as %v", table, data.As)
-	}
+		query = data.SchemaTable
 
-	query := fmt.Sprintf("%v JOIN %v ON", prefix, table)
+		return nil
+	}()
 
-	return query, nil
+	return query, err
 }
 
-func (rec *QueryJoin) Set(mode int, tablePtr interface{}) {
+func (rec *QueryTable) BuildUseAs(meta *Meta) (string, error) {
+	var query string
+
+	err := func() error {
+		data := meta.Get(rec.TablePtr)
+		if data == nil {
+			return errors.New("table meta not exist")
+		}
+
+		query = data.SchemaTable
+		if data.As != "" {
+			query = fmt.Sprintf("%v as %v", query, data.As)
+		}
+
+		return nil
+	}()
+
+	return query, err
+}
+
+func (rec *QueryTable) Set(mode int, tablePtr interface{}) {
 	rec.Mode = mode
 	rec.TablePtr = tablePtr
+}
+
+type QueryFrom struct {
+	Mode      int
+	TablePtr  interface{}
+	ValueList []interface{}
+}
+
+func (rec *QueryFrom) Build(meta *Meta) (string, []interface{}, error) {
+	var query string
+	var valueList []interface{}
+
+	err := func() error {
+		data := meta.Get(rec.TablePtr)
+		if data == nil {
+			return errors.New("from meta not exist")
+		}
+
+		query = data.SchemaTable
+		if len(rec.ValueList) > 0 {
+			var strList []string
+			for _, val := range rec.ValueList {
+				if fmt.Sprintf("%T", val) == "[]interface {}" {
+					valueList = append(valueList, val.([]interface{})...)
+				} else {
+					strList = append(strList, fmt.Sprintf("%v", val))
+				}
+			}
+
+			query = strings.Join(strList, "")
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
+func (rec *QueryFrom) BuildUseAs(meta *Meta) (string, []interface{}, error) {
+	var query string
+	var valueList []interface{}
+
+	err := func() error {
+		data := meta.Get(rec.TablePtr)
+		if data == nil {
+			return errors.New("from meta not exist")
+		}
+
+		query = data.SchemaTable
+		if len(rec.ValueList) > 0 {
+			var strList []string
+			for _, val := range rec.ValueList {
+				if fmt.Sprintf("%T", val) == "[]interface {}" {
+					valueList = append(valueList, val.([]interface{})...)
+				} else {
+					strList = append(strList, fmt.Sprintf("%v", val))
+				}
+			}
+
+			query = strings.Join(strList, "")
+		}
+
+		if data.As != "" {
+			query = fmt.Sprintf("%v as %v", query, data.As)
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
+func (rec *QueryFrom) Set(mode int, tablePtr interface{}, valueList ...interface{}) {
+	rec.Mode = mode
+	rec.TablePtr = tablePtr
+	rec.ValueList = valueList
+}
+
+type QueryJoin struct {
+	Mode      int
+	TablePtr  interface{}
+	ValueList []interface{}
+}
+
+func (rec *QueryJoin) BuildUseAs(meta *Meta) (string, []interface{}, error) {
+	var query string
+	var valueList []interface{}
+
+	err := func() error {
+		var prefix string
+		switch rec.Mode {
+		case QueryJoinModeInner:
+			prefix = "INNER"
+		case QueryJoinModeLeft:
+			prefix = "LEFT"
+		case QueryJoinModeRight:
+			prefix = "RIGHT"
+		default:
+			return errors.New("join mode not exist")
+		}
+
+		data := meta.Get(rec.TablePtr)
+		if data == nil {
+			return errors.New("join meta not exist")
+		}
+
+		var table string
+		if len(rec.ValueList) > 0 {
+			var strList []string
+			for _, val := range rec.ValueList {
+				if fmt.Sprintf("%T", val) == "[]interface {}" {
+					valueList = append(valueList, val.([]interface{})...)
+				} else {
+					strList = append(strList, fmt.Sprintf("%v", val))
+				}
+			}
+
+			table = strings.Join(strList, "")
+		} else {
+			table = data.SchemaTable
+		}
+
+		query = fmt.Sprintf("%v JOIN %v as %v ON", prefix, table, data.As)
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
+func (rec *QueryJoin) Set(mode int, tablePtr interface{}, valueList ...interface{}) {
+	rec.Mode = mode
+	rec.TablePtr = tablePtr
+	rec.ValueList = valueList
 }
 
 type QueryJoinWhere struct {
@@ -850,10 +1300,7 @@ type QueryJoinWhere struct {
 
 func (rec *QueryJoinWhere) BuildUseAs(meta *Meta) (string, string, []interface{}, error) {
 	query, valueList, err := buildQueryWhere(meta, "joinWhere", true, rec.Mode, rec.ValueList...)
-	if err != nil {
-		return "", "", nil, err
-	}
-	return rec.Prefix, query, valueList, nil
+	return rec.Prefix, query, valueList, err
 }
 
 func (rec *QueryJoinWhere) Set(mode int, prefix string, tablePtr interface{}, valueList ...interface{}) {
@@ -871,18 +1318,22 @@ type QueryValuesColumn struct {
 func (rec *QueryValuesColumn) Build(meta *Meta) (string, error) {
 	var query string
 
-	if len(rec.ValueList) != 1 {
-		return "", errors.New(fmt.Sprintf("valuesColumn length must be 1"))
-	}
+	err := func() error {
+		if len(rec.ValueList) != 1 {
+			return errors.New(fmt.Sprintf("valuesColumn length must be 1"))
+		}
 
-	data := meta.Get(rec.ValueList[0])
-	if data == nil {
-		return "", errors.New("valuesColumn meta not exist")
-	}
+		data := meta.Get(rec.ValueList[0])
+		if data == nil {
+			return errors.New("valuesColumn meta not exist")
+		}
 
-	query = data.Column
+		query = data.Column
 
-	return query, nil
+		return nil
+	}()
+
+	return query, err
 }
 
 func (rec *QueryValuesColumn) Set(mode int, valueList ...interface{}) {
@@ -899,20 +1350,24 @@ func (rec *QueryValues) Build(_ *Meta) (string, []interface{}, error) {
 	var query string
 	var valueList []interface{}
 
-	{
+	err := func() error {
 		var strList []string
 		for _, val := range rec.ValueList {
 			strList = append(strList, PlaceHolder)
 			valueList = append(valueList, val)
 		}
+
 		var str string
 		if len(strList) > 0 {
 			str = strings.Join(strList, ", ")
 		}
-		query = fmt.Sprintf("(%v)", str)
-	}
 
-	return query, valueList, nil
+		query = fmt.Sprintf("(%v)", str)
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QueryValues) Set(mode int, valueList ...interface{}) {
@@ -928,18 +1383,22 @@ type QuerySet struct {
 func (rec *QuerySet) Build(meta *Meta) (string, interface{}, error) {
 	var query string
 
-	if len(rec.ValueList) != 2 {
-		return "", nil, errors.New(fmt.Sprintf("set length must be 2"))
-	}
+	err := func() error {
+		if len(rec.ValueList) != 2 {
+			return errors.New(fmt.Sprintf("set length must be 2"))
+		}
 
-	data := meta.Get(rec.ValueList[0])
-	if data == nil {
-		return "", nil, errors.New("set meta not exist")
-	}
+		data := meta.Get(rec.ValueList[0])
+		if data == nil {
+			return errors.New("set meta not exist")
+		}
 
-	query = fmt.Sprintf("%v = %v", data.Column, PlaceHolder)
+		query = fmt.Sprintf("%v = %v", data.Column, PlaceHolder)
 
-	return query, rec.ValueList[1], nil
+		return nil
+	}()
+
+	return query, rec.ValueList[1], err
 }
 
 func (rec *QuerySet) Set(mode int, valueList ...interface{}) {
@@ -952,45 +1411,96 @@ type QuerySelect struct {
 	ValueList []interface{}
 }
 
+func (rec *QuerySelect) Build(meta *Meta) (string, []interface{}, error) {
+	var query string
+	var valueList []interface{}
+
+	err := func() error {
+		switch rec.Mode {
+		case QueryModeDefault:
+			if len(rec.ValueList) < 1 {
+				return errors.New("select length must be greater than 1")
+			}
+
+			var strList []string
+			for _, val := range rec.ValueList {
+				if fmt.Sprintf("%T", val) == "[]interface {}" {
+					valueList = append(valueList, val.([]interface{})...)
+				} else {
+					if data := meta.Get(val); data != nil {
+						strList = append(strList, data.SchemaTableColumn)
+					} else {
+						strList = append(strList, fmt.Sprintf("%v", val))
+					}
+				}
+			}
+
+			query = strings.Join(strList, "")
+		case QueryModeAll:
+			if len(rec.ValueList) != 1 {
+				return errors.New("select length should be 1")
+			}
+
+			data := meta.Get(rec.ValueList[0])
+			if data == nil {
+				return errors.New("select not exist")
+			}
+
+			query = fmt.Sprintf("%s.*", data.SchemaTable)
+		default:
+			return errors.New("select mode not exist")
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
 func (rec *QuerySelect) BuildUseAs(meta *Meta) (string, []interface{}, error) {
 	var query string
 	var valueList []interface{}
 
-	switch rec.Mode {
-	case QueryModeDefault:
-		if len(rec.ValueList) < 1 {
-			return query, valueList, errors.New("select length must be greater than 1")
-		}
+	err := func() error {
+		switch rec.Mode {
+		case QueryModeDefault:
+			if len(rec.ValueList) < 1 {
+				return errors.New("select length must be greater than 1")
+			}
 
-		var strList []string
-		for _, val := range rec.ValueList {
-			if fmt.Sprintf("%T", val) == "[]interface {}" {
-				for _, value := range val.([]interface{}) {
-					valueList = append(valueList, value)
-				}
-			} else {
-				if data := meta.Get(val); data != nil {
-					strList = append(strList, data.SchemaTableAsColumn)
+			var strList []string
+			for _, val := range rec.ValueList {
+				if fmt.Sprintf("%T", val) == "[]interface {}" {
+					valueList = append(valueList, val.([]interface{})...)
 				} else {
-					strList = append(strList, fmt.Sprintf("%v", val))
+					if data := meta.Get(val); data != nil {
+						strList = append(strList, data.SchemaTableAsColumn)
+					} else {
+						strList = append(strList, fmt.Sprintf("%v", val))
+					}
 				}
 			}
-		}
-		query = strings.Join(strList, "")
-	case QueryModeAll:
-		if len(rec.ValueList) != 1 {
-			return query, valueList, errors.New("select length should be 1")
-		}
-		data := meta.Get(rec.ValueList[0])
-		if data == nil {
-			return query, valueList, errors.New("select not exist")
-		}
-		query = fmt.Sprintf("%s.*", data.SchemaTableAs)
-	default:
-		return query, valueList, errors.New("select mode not exist")
-	}
 
-	return query, valueList, nil
+			query = strings.Join(strList, "")
+		case QueryModeAll:
+			if len(rec.ValueList) != 1 {
+				return errors.New("select length should be 1")
+			}
+
+			data := meta.Get(rec.ValueList[0])
+			if data == nil {
+				return errors.New("select not exist")
+			}
+
+			query = fmt.Sprintf("%s.*", data.SchemaTableAs)
+		default:
+			return errors.New("select mode not exist")
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
 }
 
 func (rec *QuerySelect) Set(mode int, valueList ...interface{}) {
@@ -1006,18 +1516,12 @@ type QueryWhere struct {
 
 func (rec *QueryWhere) Build(meta *Meta) (string, string, []interface{}, error) {
 	query, valueList, err := buildQueryWhere(meta, "where", false, rec.Mode, rec.ValueList...)
-	if err != nil {
-		return "", "", nil, err
-	}
-	return rec.Prefix, query, valueList, nil
+	return rec.Prefix, query, valueList, err
 }
 
 func (rec *QueryWhere) BuildUseAs(meta *Meta) (string, string, []interface{}, error) {
 	query, valueList, err := buildQueryWhere(meta, "where", true, rec.Mode, rec.ValueList...)
-	if err != nil {
-		return "", "", nil, err
-	}
-	return rec.Prefix, query, valueList, nil
+	return rec.Prefix, query, valueList, err
 }
 
 func (rec *QueryWhere) Set(mode int, prefix string, valueList ...interface{}) {
@@ -1031,14 +1535,40 @@ type QueryGroupBy struct {
 	ValueList []interface{}
 }
 
+func (rec *QueryGroupBy) Build(meta *Meta) (string, error) {
+	var query string
+
+	err := func() error {
+		if len(rec.ValueList) < 1 {
+			return errors.New("select length must be greater than 1")
+		}
+
+		var strList []string
+		for _, val := range rec.ValueList {
+			data := meta.Get(val)
+			if data != nil {
+				strList = append(strList, data.SchemaTableColumn)
+			} else {
+				strList = append(strList, fmt.Sprintf("%v", val))
+			}
+		}
+
+		query = strings.Join(strList, "")
+
+		return nil
+	}()
+
+	return query, err
+}
+
 func (rec *QueryGroupBy) BuildUseAs(meta *Meta) (string, error) {
 	var query string
 
-	if len(rec.ValueList) < 1 {
-		return query, errors.New("select length must be greater than 1")
-	}
+	err := func() error {
+		if len(rec.ValueList) < 1 {
+			return errors.New("select length must be greater than 1")
+		}
 
-	{
 		var strList []string
 		for _, val := range rec.ValueList {
 			data := meta.Get(val)
@@ -1048,10 +1578,13 @@ func (rec *QueryGroupBy) BuildUseAs(meta *Meta) (string, error) {
 				strList = append(strList, fmt.Sprintf("%v", val))
 			}
 		}
-		query = strings.Join(strList, "")
-	}
 
-	return query, nil
+		query = strings.Join(strList, "")
+
+		return nil
+	}()
+
+	return query, err
 }
 
 func (rec *QueryGroupBy) Set(mode int, valueList ...interface{}) {
@@ -1065,12 +1598,14 @@ type QueryHaving struct {
 	ValueList []interface{}
 }
 
+func (rec *QueryHaving) Build(meta *Meta) (string, string, []interface{}, error) {
+	query, valueList, err := buildQueryWhere(meta, "having", false, rec.Mode, rec.ValueList...)
+	return rec.Prefix, query, valueList, err
+}
+
 func (rec *QueryHaving) BuildUseAs(meta *Meta) (string, string, []interface{}, error) {
 	query, valueList, err := buildQueryWhere(meta, "having", true, rec.Mode, rec.ValueList...)
-	if err != nil {
-		return "", "", nil, err
-	}
-	return rec.Prefix, query, valueList, nil
+	return rec.Prefix, query, valueList, err
 }
 
 func (rec *QueryHaving) Set(mode int, prefix string, valueList ...interface{}) {
@@ -1084,37 +1619,80 @@ type QueryOrderBy struct {
 	ValueList []interface{}
 }
 
+func (rec *QueryOrderBy) Build(meta *Meta) (string, error) {
+	var query string
+
+	err := func() error {
+		if len(rec.ValueList) < 1 {
+			return errors.New("orderBy length must be greater than 1")
+		}
+
+		{
+			var strList []string
+			for _, val := range rec.ValueList {
+				data := meta.Get(val)
+				if data != nil {
+					strList = append(strList, data.SchemaTableColumn)
+				} else {
+					strList = append(strList, fmt.Sprintf("%v", val))
+				}
+			}
+
+			query = strings.Join(strList, "")
+		}
+
+		switch rec.Mode {
+		case QueryModeDefault:
+		case QueryModeAsc:
+			query = fmt.Sprintf("%s ASC", query)
+		case QueryModeDesc:
+			query = fmt.Sprintf("%s DESC", query)
+		default:
+			return errors.New("orderBy mode not exist")
+		}
+
+		return nil
+	}()
+
+	return query, err
+}
+
 func (rec *QueryOrderBy) BuildUseAs(meta *Meta) (string, error) {
 	var query string
 
-	if len(rec.ValueList) < 1 {
-		return query, errors.New("orderBy length must be greater than 1")
-	}
-
-	{
-		var strList []string
-		for _, val := range rec.ValueList {
-			data := meta.Get(val)
-			if data != nil {
-				strList = append(strList, data.SchemaTableAsColumn)
-			} else {
-				strList = append(strList, fmt.Sprintf("%v", val))
-			}
+	err := func() error {
+		if len(rec.ValueList) < 1 {
+			return errors.New("orderBy length must be greater than 1")
 		}
-		query = strings.Join(strList, "")
-	}
 
-	switch rec.Mode {
-	case QueryModeDefault:
-	case QueryModeAsc:
-		query = fmt.Sprintf("%s ASC", query)
-	case QueryModeDesc:
-		query = fmt.Sprintf("%s DESC", query)
-	default:
-		return query, errors.New("orderBy mode not exist")
-	}
+		{
+			var strList []string
+			for _, val := range rec.ValueList {
+				data := meta.Get(val)
+				if data != nil {
+					strList = append(strList, data.SchemaTableAsColumn)
+				} else {
+					strList = append(strList, fmt.Sprintf("%v", val))
+				}
+			}
 
-	return query, nil
+			query = strings.Join(strList, "")
+		}
+
+		switch rec.Mode {
+		case QueryModeDefault:
+		case QueryModeAsc:
+			query = fmt.Sprintf("%s ASC", query)
+		case QueryModeDesc:
+			query = fmt.Sprintf("%s DESC", query)
+		default:
+			return errors.New("orderBy mode not exist")
+		}
+
+		return nil
+	}()
+
+	return query, err
 }
 
 func (rec *QueryOrderBy) Set(mode int, valueList ...interface{}) {

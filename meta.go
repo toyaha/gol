@@ -15,6 +15,7 @@ func NewMeta(config *Config) *Meta {
 		DatabaseType:              config.DatabaseType,
 		NamingConventionForTable:  config.NamingConvention,
 		NamingConventionForColumn: config.NamingConvention,
+		Count:                     0,
 		Value:                     make(map[string]*MetaValue),
 	}
 
@@ -25,10 +26,11 @@ type Meta struct {
 	DatabaseType              string
 	NamingConventionForTable  string
 	NamingConventionForColumn string
+	Count                     int
 	Value                     map[string]*MetaValue
 }
 
-func (rec *Meta) Add(schema string, tablePtr interface{}, as string) error {
+func (rec *Meta) Add(tablePtr interface{}, useAs bool) error {
 	tableType := reflect.TypeOf(tablePtr).Elem()
 	tableVal := reflect.ValueOf(tablePtr).Elem()
 
@@ -41,6 +43,14 @@ func (rec *Meta) Add(schema string, tablePtr interface{}, as string) error {
 		return ChangeFromPascalCaseToSnakeCase(val)
 	}()
 
+	as := func() string {
+		if !useAs {
+			return ""
+		}
+		rec.Count++
+		return fmt.Sprintf("t%v", rec.Count)
+	}()
+
 	numField := tableType.NumField()
 	if numField < 1 {
 		return errors.New("table none field")
@@ -51,9 +61,6 @@ func (rec *Meta) Add(schema string, tablePtr interface{}, as string) error {
 		fieldVal := tableVal.FieldByName(fieldType.Name)
 
 		baseSchema := func() string {
-			if schema != "" {
-				return schema
-			}
 			return fieldType.Tag.Get(StructFieldTagNameSchema)
 		}()
 

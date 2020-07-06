@@ -12,178 +12,8 @@ var (
 )
 
 func TestClient_Exec(t *testing.T) {
-	t.Run("mssql table insert", func(t *testing.T) {
+	t.Run("mssql insert", func(t *testing.T) {
 		db, err := test.NewClientMssql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQueryWithSchema(test.SchemaMssql, &table)
-		query.SetValuesColumn(
-			&table.Name,
-		)
-		query.SetValues(
-			table.Name,
-		)
-		_, err = query.Insert()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("mssql table update", func(t *testing.T) {
-		db, err := test.NewClientMssql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQueryWithSchema(test.SchemaMssql, &table)
-		query.SetSet(&table.Name, "update")
-		query.SetWhereIs(&table.Name, "")
-		_, err = query.Update()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("mssql table delete", func(t *testing.T) {
-		db, err := test.NewClientMssql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQueryWithSchema(test.SchemaMssql, &table)
-		query.SetWhereIs(&table.Name, "update")
-		_, err = query.Delete()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("mssql table truncate", func(t *testing.T) {
-		db, err := test.NewClientMssql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQueryWithSchema(test.SchemaMssql, &table)
-		_, err = query.Truncate()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("mssql table as insert", func(t *testing.T) {
-		db, err := test.NewClientMssql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQueryAsWithSchema(test.SchemaMssql, &table, "test")
-		query.SetValuesColumn(
-			&table.Name,
-		)
-		query.SetValues(
-			table.Name,
-		)
-		_, err = query.Insert()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("mssql table as update", func(t *testing.T) {
-		db, err := test.NewClientMssql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQueryAsWithSchema(test.SchemaMssql, &table, "alias")
-		query.SetSet(&table.Name, "update")
-		query.SetWhereIs(&table.Name, "")
-		_, err = query.Update()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("mssql table as delete", func(t *testing.T) {
-		db, err := test.NewClientMssql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQueryAsWithSchema(test.SchemaMssql, &table, "alias")
-		query.SetWhereIs(&table.Name, "update")
-		_, err = query.Delete()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("mssql table as truncate", func(t *testing.T) {
-		db, err := test.NewClientMssql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQueryAsWithSchema(test.SchemaMssql, &table, "alias")
-		_, err = query.Truncate()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("mysql table insert", func(t *testing.T) {
-		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
 			return
@@ -195,10 +25,10 @@ func TestClient_Exec(t *testing.T) {
 		table := test.Item{}
 		query := db.NewQuery(&table)
 		query.SetValuesColumn(
-			&table.Name,
+			&table.Str,
 		)
 		query.SetValues(
-			table.Name,
+			table.Str,
 		)
 		_, err = query.Insert()
 		if err != nil {
@@ -207,8 +37,8 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql table update", func(t *testing.T) {
-		db, err := test.NewClientMysql()
+	t.Run("mssql insert bulk", func(t *testing.T) {
+		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
 			return
@@ -219,8 +49,36 @@ func TestClient_Exec(t *testing.T) {
 
 		table := test.Item{}
 		query := db.NewQuery(&table)
-		query.SetSet(&table.Name, "update")
-		query.SetWhereIs(&table.Name, "")
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.Insert()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("mssql update", func(t *testing.T) {
+		db, err := test.NewClientMssql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetSet(&table.Str, "update")
+		query.SetWhereIs(&table.Str, "")
 		_, err = query.Update()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -228,8 +86,8 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql table delete", func(t *testing.T) {
-		db, err := test.NewClientMysql()
+	t.Run("mssql delete", func(t *testing.T) {
+		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
 			return
@@ -240,7 +98,7 @@ func TestClient_Exec(t *testing.T) {
 
 		table := test.Item{}
 		query := db.NewQuery(&table)
-		query.SetWhereIs(&table.Name, "update")
+		query.SetWhereIs(&table.Str, "update")
 		_, err = query.Delete()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -248,8 +106,8 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql table truncate", func(t *testing.T) {
-		db, err := test.NewClientMysql()
+	t.Run("mssql truncate", func(t *testing.T) {
+		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
 			return
@@ -267,7 +125,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql table as insert", func(t *testing.T) {
+	t.Run("mysql insert", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -278,12 +136,12 @@ func TestClient_Exec(t *testing.T) {
 		}()
 
 		table := test.Item{}
-		query := db.NewQueryAs(&table, "alias")
+		query := db.NewQuery(&table)
 		query.SetValuesColumn(
-			&table.Name,
+			&table.Str,
 		)
 		query.SetValues(
-			table.Name,
+			table.Str,
 		)
 		_, err = query.Insert()
 		if err != nil {
@@ -292,7 +150,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql table as update", func(t *testing.T) {
+	t.Run("mysql insert bulk", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -303,9 +161,37 @@ func TestClient_Exec(t *testing.T) {
 		}()
 
 		table := test.Item{}
-		query := db.NewQueryAs(&table, "alias")
-		query.SetSet(&table.Name, "update")
-		query.SetWhereIs(&table.Name, "")
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.Insert()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("mysql update", func(t *testing.T) {
+		db, err := test.NewClientMysql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetSet(&table.Str, "update")
+		query.SetWhereIs(&table.Str, "")
 		_, err = query.Update()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -313,7 +199,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql table as delete", func(t *testing.T) {
+	t.Run("mysql delete", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -324,8 +210,8 @@ func TestClient_Exec(t *testing.T) {
 		}()
 
 		table := test.Item{}
-		query := db.NewQueryAs(&table, "alias")
-		query.SetWhereIs(&table.Name, "update")
+		query := db.NewQuery(&table)
+		query.SetWhereIs(&table.Str, "update")
 		_, err = query.Delete()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -333,7 +219,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql table as truncate", func(t *testing.T) {
+	t.Run("mysql truncate", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -344,7 +230,7 @@ func TestClient_Exec(t *testing.T) {
 		}()
 
 		table := test.Item{}
-		query := db.NewQueryAs(&table, "alias")
+		query := db.NewQuery(&table)
 		_, err = query.Truncate()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -363,12 +249,12 @@ func TestClient_Exec(t *testing.T) {
 		}()
 
 		table := test.Item{}
-		query := db.NewQueryWithSchema(test.SchemaPostgresql, &table)
+		query := db.NewQuery(&table)
 		query.SetValuesColumn(
-			&table.Name,
+			&table.Str,
 		)
 		query.SetValues(
-			table.Name,
+			table.Str,
 		)
 		_, err = query.Insert()
 		if err != nil {
@@ -377,7 +263,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql table update", func(t *testing.T) {
+	t.Run("postgresql insert bulk", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -388,91 +274,15 @@ func TestClient_Exec(t *testing.T) {
 		}()
 
 		table := test.Item{}
-		query := db.NewQueryWithSchema(test.SchemaPostgresql, &table)
-		query.SetSet(&table.Name, "update")
-		query.SetWhereIs(&table.Name, "")
-		_, err = query.Update()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("postgresql table delete", func(t *testing.T) {
-		db, err := test.NewClientPostgresql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQueryWithSchema(test.SchemaPostgresql, &table)
-		query.SetWhereIs(&table.Name, "update")
-		_, err = query.Delete()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("postgresql table truncate", func(t *testing.T) {
-		db, err := test.NewClientPostgresql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQueryWithSchema(test.SchemaPostgresql, &table)
-		_, err = query.Truncate()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("postgresql table truncate restart identity", func(t *testing.T) {
-		db, err := test.NewClientPostgresql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQueryWithSchema(test.SchemaPostgresql, &table)
-		_, err = query.TruncateRestartIdentity()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("postgresql table as insert", func(t *testing.T) {
-		db, err := test.NewClientPostgresql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQueryAsWithSchema(test.SchemaPostgresql, &table, "alias")
+		query := db.NewQuery(&table)
 		query.SetValuesColumn(
-			&table.Name,
+			&table.Str,
 		)
 		query.SetValues(
-			table.Name,
+			table.Str,
+		)
+		query.SetValues(
+			table.Str,
 		)
 		_, err = query.Insert()
 		if err != nil {
@@ -481,7 +291,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql table as update", func(t *testing.T) {
+	t.Run("postgresql update", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -492,9 +302,9 @@ func TestClient_Exec(t *testing.T) {
 		}()
 
 		table := test.Item{}
-		query := db.NewQueryAsWithSchema(test.SchemaPostgresql, &table, "alias")
-		query.SetSet(&table.Name, "update")
-		query.SetWhereIs(&table.Name, "")
+		query := db.NewQuery(&table)
+		query.SetSet(&table.Str, "update")
+		query.SetWhereIs(&table.Str, "")
 		_, err = query.Update()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -502,7 +312,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql table as delete", func(t *testing.T) {
+	t.Run("postgresql delete", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -513,8 +323,8 @@ func TestClient_Exec(t *testing.T) {
 		}()
 
 		table := test.Item{}
-		query := db.NewQueryAsWithSchema(test.SchemaPostgresql, &table, "alias")
-		query.SetWhereIs(&table.Name, "update")
+		query := db.NewQuery(&table)
+		query.SetWhereIs(&table.Str, "update")
 		_, err = query.Delete()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -522,7 +332,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql table as truncate", func(t *testing.T) {
+	t.Run("postgresql truncate", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -533,7 +343,7 @@ func TestClient_Exec(t *testing.T) {
 		}()
 
 		table := test.Item{}
-		query := db.NewQueryAsWithSchema(test.SchemaPostgresql, &table, "alias")
+		query := db.NewQuery(&table)
 		_, err = query.Truncate()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -541,7 +351,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql table as truncate restart identity", func(t *testing.T) {
+	t.Run("postgresql truncate restart identity", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -552,7 +362,7 @@ func TestClient_Exec(t *testing.T) {
 		}()
 
 		table := test.Item{}
-		query := db.NewQueryAsWithSchema(test.SchemaPostgresql, &table, "alias")
+		query := db.NewQuery(&table)
 		_, err = query.TruncateRestartIdentity()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -562,7 +372,10 @@ func TestClient_Exec(t *testing.T) {
 }
 
 func TestClient_Meta(t *testing.T) {
-	t.Run("meta item", func(t *testing.T) {
+	tableItem := test.Item{}
+	tableTag := test.Tag{}
+
+	fn := func(t *testing.T, table interface{}, field interface{}, checkMap map[string]string) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -572,261 +385,217 @@ func TestClient_Meta(t *testing.T) {
 			_ = db.Close()
 		}()
 
-		table := test.Item{}
-		db.AddMeta(&table)
+		db.AddMeta(table)
 
 		{
-			target := db.GetBaseSchema(&table.Id)
-			check := ``
+			target := db.GetBaseSchema(field)
+			check, ok := checkMap["BaseSchema"]
+			if !ok {
+				t.Error("BaseSchema is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetBaseTable(&table.Id)
-			check := `item`
+			target := db.GetBaseTable(field)
+			check, ok := checkMap["BaseTable"]
+			if !ok {
+				t.Error("BaseTable is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetBaseAs(&table.Id)
-			check := ``
+			target := db.GetBaseAs(field)
+			check, ok := checkMap["BaseAs"]
+			if !ok {
+				t.Error("BaseAs is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetBaseColumn(&table.Id)
-			check := `id`
+			target := db.GetBaseColumn(field)
+			check, ok := checkMap["BaseColumn"]
+			if !ok {
+				t.Error("BaseColumn is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetSchema(&table.Id)
-			check := ``
+			target := db.GetSchema(field)
+			check, ok := checkMap["Schema"]
+			if !ok {
+				t.Error("Schema is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetTable(&table.Id)
-			check := `"item"`
+			target := db.GetTable(field)
+			check, ok := checkMap["Table"]
+			if !ok {
+				t.Error("Table is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetAs(&table.Id)
-			check := ``
+			target := db.GetAs(field)
+			check, ok := checkMap["As"]
+			if !ok {
+				t.Error("As is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetColumn(&table.Id)
-			check := `"id"`
+			target := db.GetColumn(field)
+			check, ok := checkMap["Column"]
+			if !ok {
+				t.Error("Column is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetTableAs(&table.Id)
-			check := `"item"`
+			target := db.GetTableColumn(field)
+			check, ok := checkMap["TableColumn"]
+			if !ok {
+				t.Error("TableColumn is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetSchemaTable(&table.Id)
-			check := `"item"`
+			target := db.GetTableAs(field)
+			check, ok := checkMap["TableAs"]
+			if !ok {
+				t.Error("TableAs is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetSchemaTableColumn(&table.Id)
-			check := `"item"."id"`
+			target := db.GetTableAsColumn(field)
+			check, ok := checkMap["TableAsColumn"]
+			if !ok {
+				t.Error("TableAsColumn is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetSchemaTableAs(&table.Id)
-			check := `"item"`
+			target := db.GetSchemaTable(field)
+			check, ok := checkMap["SchemaTable"]
+			if !ok {
+				t.Error("SchemaTable is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetSchemaTableAsColumn(&table.Id)
-			check := `"item"."id"`
+			target := db.GetSchemaTableColumn(field)
+			check, ok := checkMap["SchemaTableColumn"]
+			if !ok {
+				t.Error("SchemaTableColumn is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetTableAs(&table.Id)
-			check := `"item"`
+			target := db.GetSchemaTableAs(field)
+			check, ok := checkMap["SchemaTableAs"]
+			if !ok {
+				t.Error("SchemaTableAs is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
 
 		{
-			target := db.GetTableAsColumn(&table.Id)
-			check := `"item"."id"`
+			target := db.GetSchemaTableAsColumn(field)
+			check, ok := checkMap["SchemaTableAsColumn"]
+			if !ok {
+				t.Error("SchemaTableAsColumn is not exist")
+			}
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
 		}
+	}
+
+	t.Run("item", func(t *testing.T) {
+		var table interface{} = &tableItem
+		var field interface{} = &tableItem.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          ``,
+			"BaseTable":           `item`,
+			"BaseAs":              ``,
+			"BaseColumn":          `str`,
+			"Schema":              ``,
+			"Table":               `"item"`,
+			"As":                  ``,
+			"Column":              `"str"`,
+			"TableColumn":         `"item"."str"`,
+			"TableAs":             `"item"`,
+			"TableAsColumn":       `"item"."str"`,
+			"SchemaTable":         `"item"`,
+			"SchemaTableColumn":   `"item"."str"`,
+			"SchemaTableAs":       `"item"`,
+			"SchemaTableAsColumn": `"item"."str"`,
+		}
+		fn(t, table, field, checkMap)
 	})
 
-	t.Run("meta tag", func(t *testing.T) {
-		db, err := test.NewClientPostgresql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
+	t.Run("tag", func(t *testing.T) {
+		var table interface{} = &tableTag
+		var field interface{} = &tableTag.Str
+		var checkMap = map[string]string{
+			"BaseSchema":          `PUBLIC`,
+			"BaseTable":           `TAG`,
+			"BaseAs":              ``,
+			"BaseColumn":          `STR`,
+			"Schema":              `"PUBLIC"`,
+			"Table":               `"TAG"`,
+			"As":                  ``,
+			"Column":              `"STR"`,
+			"TableColumn":         `"TAG"."STR"`,
+			"TableAs":             `"TAG"`,
+			"TableAsColumn":       `"TAG"."STR"`,
+			"SchemaTable":         `"PUBLIC"."TAG"`,
+			"SchemaTableColumn":   `"PUBLIC"."TAG"."STR"`,
+			"SchemaTableAs":       `"PUBLIC"."TAG"`,
+			"SchemaTableAsColumn": `"PUBLIC"."TAG"."STR"`,
 		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Tag{}
-		db.AddMeta(&table)
-
-		{
-			target := db.GetBaseSchema(&table.Id)
-			check := `PUBLIC`
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetBaseTable(&table.Id)
-			check := `TAG`
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetBaseAs(&table.Id)
-			check := ``
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetBaseColumn(&table.Id)
-			check := `ID`
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetSchema(&table.Id)
-			check := `"PUBLIC"`
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetTable(&table.Id)
-			check := `"TAG"`
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetAs(&table.Id)
-			check := ``
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetColumn(&table.Id)
-			check := `"ID"`
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetTableAs(&table.Id)
-			check := `"TAG"`
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetSchemaTable(&table.Id)
-			check := `"PUBLIC"."TAG"`
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetSchemaTableColumn(&table.Id)
-			check := `"PUBLIC"."TAG"."ID"`
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetSchemaTableAs(&table.Id)
-			check := `"PUBLIC"."TAG"`
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetSchemaTableAsColumn(&table.Id)
-			check := `"PUBLIC"."TAG"."ID"`
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetTableAs(&table.Id)
-			check := `"TAG"`
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
-
-		{
-			target := db.GetTableAsColumn(&table.Id)
-			check := `"TAG"."ID"`
-			if target != check {
-				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
-			}
-		}
+		fn(t, table, field, checkMap)
 	})
 }
