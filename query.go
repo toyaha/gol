@@ -92,75 +92,99 @@ func (rec *Query) InsertBulkFinish() (sql.Result, error) {
 }
 
 func (rec *Query) Update() (sql.Result, error) {
-	if rec.Client == nil {
-		return nil, errors.New("database does not exist")
-	}
+	var result sql.Result
 
-	query, valueList, err := rec.GetUpdateQuery()
-	if err != nil {
-		return nil, err
-	}
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
 
-	result, err := rec.Client.Exec(query, valueList...)
-	if err != nil {
-		return nil, err
-	}
+		query, valueList, err := rec.GetUpdateQuery()
+		if err != nil {
+			return err
+		}
 
-	return result, nil
+		result, err = rec.Client.Exec(query, valueList...)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}()
+
+	return result, err
 }
 
 func (rec *Query) Delete() (sql.Result, error) {
-	if rec.Client == nil {
-		return nil, errors.New("database does not exist")
-	}
+	var result sql.Result
 
-	query, valueList, err := rec.GetDeleteQuery()
-	if err != nil {
-		return nil, err
-	}
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
 
-	result, err := rec.Client.Exec(query, valueList...)
-	if err != nil {
-		return nil, err
-	}
+		query, valueList, err := rec.GetDeleteQuery()
+		if err != nil {
+			return err
+		}
 
-	return result, nil
+		result, err = rec.Client.Exec(query, valueList...)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}()
+
+	return result, err
 }
 
 func (rec *Query) Truncate() (sql.Result, error) {
-	if rec.Client == nil {
-		return nil, errors.New("database does not exist")
-	}
+	var result sql.Result
 
-	query, valueList, err := rec.GetTruncateQuery()
-	if err != nil {
-		return nil, err
-	}
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
 
-	result, err := rec.Client.Exec(query, valueList...)
-	if err != nil {
-		return nil, err
-	}
+		query, valueList, err := rec.GetTruncateQuery()
+		if err != nil {
+			return err
+		}
 
-	return result, nil
+		result, err = rec.Client.Exec(query, valueList...)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}()
+
+	return result, err
 }
 
 func (rec *Query) TruncateRestartIdentity() (sql.Result, error) {
-	if rec.Client == nil {
-		return nil, errors.New("database does not exist")
-	}
+	var result sql.Result
 
-	query, valueList, err := rec.GetTruncateRestartIdentityQuery()
-	if err != nil {
-		return nil, err
-	}
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
 
-	result, err := rec.Client.Exec(query, valueList...)
-	if err != nil {
-		return nil, err
-	}
+		query, valueList, err := rec.GetTruncateRestartIdentityQuery()
+		if err != nil {
+			return err
+		}
 
-	return result, nil
+		result, err = rec.Client.Exec(query, valueList...)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}()
+
+	return result, err
 }
 
 func (rec *Query) Select(dest interface{}) error {
