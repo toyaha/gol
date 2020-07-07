@@ -26,21 +26,27 @@ type Query struct {
 }
 
 func (rec *Query) Insert() (sql.Result, error) {
-	if rec.Client == nil {
-		return nil, errors.New("database does not exist")
-	}
+	var result sql.Result
 
-	query, valueList, err := rec.GetInsertQuery()
-	if err != nil {
-		return nil, err
-	}
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
 
-	result, err := rec.Client.Exec(query, valueList...)
-	if err != nil {
-		return nil, err
-	}
+		query, valueList, err := rec.GetInsertQuery()
+		if err != nil {
+			return err
+		}
 
-	return result, nil
+		result, err = rec.Client.Exec(query, valueList...)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}()
+
+	return result, err
 }
 
 func (rec *Query) InsertBulk() (sql.Result, error) {
@@ -83,6 +89,54 @@ func (rec *Query) InsertBulkFinish() (sql.Result, error) {
 			}
 
 			rec.Value.ClearValues()
+		}
+
+		return nil
+	}()
+
+	return result, err
+}
+
+func (rec *Query) InsertIgnore() (sql.Result, error) {
+	var result sql.Result
+
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
+
+		query, valueList, err := rec.GetInsertIgnoreQuery()
+		if err != nil {
+			return err
+		}
+
+		result, err = rec.Client.Exec(query, valueList...)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}()
+
+	return result, err
+}
+
+func (rec *Query) InsertOnDuplicateKeyUpdate() (sql.Result, error) {
+	var result sql.Result
+
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
+
+		query, valueList, err := rec.GetInsertOnDuplicateKeyUpdateQuery()
+		if err != nil {
+			return err
+		}
+
+		result, err = rec.Client.Exec(query, valueList...)
+		if err != nil {
+			return err
 		}
 
 		return nil
@@ -225,6 +279,14 @@ func (rec *Query) SelectCount(dest interface{}) error {
 
 func (rec *Query) GetInsertQuery() (string, []interface{}, error) {
 	return rec.Value.GetInsertQuery()
+}
+
+func (rec *Query) GetInsertIgnoreQuery() (string, []interface{}, error) {
+	return rec.Value.GetInsertIgnoreQuery()
+}
+
+func (rec *Query) GetInsertOnDuplicateKeyUpdateQuery() (string, []interface{}, error) {
+	return rec.Value.GetInsertOnDuplicateKeyUpdateQuery()
 }
 
 func (rec *Query) GetUpdateQuery() (string, []interface{}, error) {

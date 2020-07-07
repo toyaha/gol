@@ -49,9 +49,11 @@ func (rec *QueryValue) GetInsertQuery() (string, []interface{}, error) {
 			if err != nil {
 				return err
 			}
+
 			if str == "" {
 				return errors.New("table not exist")
 			}
+
 			query = fmt.Sprintf("%v INTO %v", query, str)
 		}
 
@@ -60,6 +62,7 @@ func (rec *QueryValue) GetInsertQuery() (string, []interface{}, error) {
 			if err != nil {
 				return err
 			}
+
 			if str != "" {
 				query = fmt.Sprintf("%v %v", query, str)
 			}
@@ -70,10 +73,124 @@ func (rec *QueryValue) GetInsertQuery() (string, []interface{}, error) {
 			if err != nil {
 				return err
 			}
+
 			if str == "" {
 				return errors.New("values not exist")
 			}
+
 			query = fmt.Sprintf("%v VALUES %v", query, str)
+			valueList = append(valueList, valList...)
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
+func (rec *QueryValue) GetInsertIgnoreQuery() (string, []interface{}, error) {
+	var query = "INSERT IGNORE"
+	var valueList []interface{}
+
+	err := func() error {
+		{
+			str, err := rec.BuildTable()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("table not exist")
+			}
+
+			query = fmt.Sprintf("%v INTO %v", query, str)
+		}
+
+		{
+			str, err := rec.BuildValuesColumn()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, valList, err := rec.BuildValues()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("values not exist")
+			}
+
+			query = fmt.Sprintf("%v VALUES %v", query, str)
+			valueList = append(valueList, valList...)
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
+func (rec *QueryValue) GetInsertOnDuplicateKeyUpdateQuery() (string, []interface{}, error) {
+	var query = "INSERT"
+	var valueList []interface{}
+
+	err := func() error {
+		{
+			str, err := rec.BuildTable()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("table not exist")
+			}
+
+			query = fmt.Sprintf("%v INTO %v", query, str)
+		}
+
+		{
+			str, err := rec.BuildValuesColumn()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, valList, err := rec.BuildValues()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("values not exist")
+			}
+
+			query = fmt.Sprintf("%v VALUES %v", query, str)
+			valueList = append(valueList, valList...)
+		}
+
+		{
+			str, valList, err := rec.BuildSet()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("set not exist")
+			}
+
+			query = fmt.Sprintf("%v ON DUPLICATE KEY UPDATE %v", query, str)
 			valueList = append(valueList, valList...)
 		}
 
@@ -93,9 +210,11 @@ func (rec *QueryValue) GetUpdateQuery() (string, []interface{}, error) {
 			if err != nil {
 				return err
 			}
+
 			if str == "" {
 				return errors.New("table not exist")
 			}
+
 			query = fmt.Sprintf("%v %v", query, str)
 		}
 
@@ -104,10 +223,12 @@ func (rec *QueryValue) GetUpdateQuery() (string, []interface{}, error) {
 			if err != nil {
 				return err
 			}
+
 			if str == "" {
 				return errors.New("set not exist")
 			}
-			query = fmt.Sprintf("%v %v", query, str)
+
+			query = fmt.Sprintf("%v SET %v", query, str)
 			valueList = append(valueList, valList...)
 		}
 
@@ -116,6 +237,7 @@ func (rec *QueryValue) GetUpdateQuery() (string, []interface{}, error) {
 			if err != nil {
 				return err
 			}
+
 			if str != "" {
 				query = fmt.Sprintf("%v %v", query, str)
 				valueList = append(valueList, valList...)
@@ -688,7 +810,6 @@ func (rec *QueryValue) BuildSet() (string, []interface{}, error) {
 
 		if len(strList) > 0 {
 			query = strings.Join(strList, ", ")
-			query = fmt.Sprintf("SET %v", query)
 		}
 
 		return nil
