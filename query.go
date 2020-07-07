@@ -25,46 +25,6 @@ type Query struct {
 	Value  *QueryValue
 }
 
-func (rec *Query) BulkInsert() (sql.Result, error) {
-	var err error
-	var result sql.Result
-
-	if rec.Client == nil {
-		return nil, errors.New("database does not exist")
-	}
-
-	if rec.Config.BulkInsertCount > 0 && rec.Value.GetValuesCount() >= rec.Config.BulkInsertCount {
-		result, err = rec.Insert()
-		if err != nil {
-			return nil, err
-		}
-
-		rec.Value.ClearValues()
-	}
-
-	return result, nil
-}
-
-func (rec *Query) BulkInsertFinish() (sql.Result, error) {
-	var err error
-	var result sql.Result
-
-	if rec.Client == nil {
-		return nil, errors.New("database does not exist")
-	}
-
-	if rec.Config.BulkInsertCount > 0 && rec.Value.GetValuesCount() > 0 {
-		result, err = rec.Insert()
-		if err != nil {
-			return nil, err
-		}
-
-		rec.Value.ClearValues()
-	}
-
-	return result, nil
-}
-
 func (rec *Query) Insert() (sql.Result, error) {
 	if rec.Client == nil {
 		return nil, errors.New("database does not exist")
@@ -81,6 +41,54 @@ func (rec *Query) Insert() (sql.Result, error) {
 	}
 
 	return result, nil
+}
+
+func (rec *Query) InsertBulk() (sql.Result, error) {
+	var result sql.Result
+
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
+
+		if rec.Config.BulkInsertCount > 0 && rec.Value.GetValuesCount() >= rec.Config.BulkInsertCount {
+			var err error
+			result, err = rec.Insert()
+			if err != nil {
+				return err
+			}
+
+			rec.Value.ClearValues()
+		}
+
+		return nil
+	}()
+
+	return result, err
+}
+
+func (rec *Query) InsertBulkFinish() (sql.Result, error) {
+	var result sql.Result
+
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
+
+		if rec.Config.BulkInsertCount > 0 && rec.Value.GetValuesCount() > 0 {
+			var err error
+			result, err = rec.Insert()
+			if err != nil {
+				return err
+			}
+
+			rec.Value.ClearValues()
+		}
+
+		return nil
+	}()
+
+	return result, err
 }
 
 func (rec *Query) Update() (sql.Result, error) {
