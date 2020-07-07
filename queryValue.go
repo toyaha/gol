@@ -29,6 +29,7 @@ type QueryValue struct {
 	JoinWhereList    []*QueryJoinWhere
 	ValuesColumnList []*QueryValuesColumn
 	ValuesList       []*QueryValues
+	ConfLictList     []*QueryConflict
 	SetList          []*QuerySet
 	SelectList       []*QuerySelect
 	WhereList        []*QueryWhere
@@ -79,6 +80,134 @@ func (rec *QueryValue) GetInsertQuery() (string, []interface{}, error) {
 			}
 
 			query = fmt.Sprintf("%v VALUES %v", query, str)
+			valueList = append(valueList, valList...)
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
+func (rec *QueryValue) GetInsertDoNothingQuery() (string, []interface{}, error) {
+	var query = "INSERT"
+	var valueList []interface{}
+
+	err := func() error {
+		{
+			str, err := rec.BuildTable()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("table not exist")
+			}
+
+			query = fmt.Sprintf("%v INTO %v", query, str)
+		}
+
+		{
+			str, err := rec.BuildValuesColumn()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, valList, err := rec.BuildValues()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("values not exist")
+			}
+
+			query = fmt.Sprintf("%v VALUES %v", query, str)
+			valueList = append(valueList, valList...)
+		}
+
+		query = fmt.Sprintf("%v ON CONFLICT DO NOTHING", query)
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
+func (rec *QueryValue) GetInsertDoUpdateQuery() (string, []interface{}, error) {
+	var query = "INSERT"
+	var valueList []interface{}
+
+	err := func() error {
+		{
+			str, err := rec.BuildTable()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("table not exist")
+			}
+
+			query = fmt.Sprintf("%v INTO %v", query, str)
+		}
+
+		{
+			str, err := rec.BuildValuesColumn()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, valList, err := rec.BuildValues()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("values not exist")
+			}
+
+			query = fmt.Sprintf("%v VALUES %v", query, str)
+			valueList = append(valueList, valList...)
+		}
+
+		{
+			str, valList, err := rec.BuildConflict()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("conflict not exist")
+			}
+
+			query = fmt.Sprintf("%v ON CONFLICT (%v)", query, str)
+			valueList = append(valueList, valList...)
+		}
+
+		{
+			str, valList, err := rec.BuildSet()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("set not exist")
+			}
+
+			query = fmt.Sprintf("%v DO UPDATE SET %v", query, str)
 			valueList = append(valueList, valList...)
 		}
 
@@ -792,6 +921,32 @@ func (rec *QueryValue) BuildValues() (string, []interface{}, error) {
 	return query, valueList, err
 }
 
+func (rec *QueryValue) BuildConflict() (string, []interface{}, error) {
+	var query string
+	var valueList []interface{}
+
+	err := func() error {
+		var strList []string
+		for _, val := range rec.ConfLictList {
+			str, valueList, err := val.Build(rec.Meta)
+			if err != nil {
+				return err
+			}
+
+			strList = append(strList, str)
+			valueList = append(valueList, valueList...)
+		}
+
+		if len(strList) > 0 {
+			query = strings.Join(strList, ", ")
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
 func (rec *QueryValue) BuildSet() (string, []interface{}, error) {
 	var query string
 	var valueList []interface{}
@@ -1187,6 +1342,12 @@ func (rec *QueryValue) ClearValues() {
 	rec.ValuesList = make([]*QueryValues, 0)
 }
 
+func (rec *QueryValue) AddConflict(mode int, valueList ...interface{}) {
+	data := &QueryConflict{}
+	data.Set(mode, valueList...)
+	rec.ConfLictList = append(rec.ConfLictList, data)
+}
+
 func (rec *QueryValue) AddSet(mode int, valueList ...interface{}) {
 	data := &QuerySet{}
 	data.Set(mode, valueList...)
@@ -1492,6 +1653,38 @@ func (rec *QueryValues) Build(_ *Meta) (string, []interface{}, error) {
 }
 
 func (rec *QueryValues) Set(mode int, valueList ...interface{}) {
+	rec.Mode = mode
+	rec.ValueList = valueList
+}
+
+type QueryConflict struct {
+	Mode      int
+	ValueList []interface{}
+}
+
+func (rec *QueryConflict) Build(meta *Meta) (string, []interface{}, error) {
+	var query string
+	var valueList []interface{}
+
+	err := func() error {
+		if len(rec.ValueList) != 1 {
+			return errors.New(fmt.Sprintf("conflict length must be 1"))
+		}
+
+		data := meta.Get(rec.ValueList[0])
+		if data == nil {
+			return errors.New("conflict meta not exist")
+		}
+
+		query = data.Column
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
+func (rec *QueryConflict) Set(mode int, valueList ...interface{}) {
 	rec.Mode = mode
 	rec.ValueList = valueList
 }

@@ -97,6 +97,54 @@ func (rec *Query) InsertBulkFinish() (sql.Result, error) {
 	return result, err
 }
 
+func (rec *Query) InsertDoNoting() (sql.Result, error) {
+	var result sql.Result
+
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
+
+		query, valueList, err := rec.GetInsertDoNothingQuery()
+		if err != nil {
+			return err
+		}
+
+		result, err = rec.Client.Exec(query, valueList...)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}()
+
+	return result, err
+}
+
+func (rec *Query) InsertDoUpdate() (sql.Result, error) {
+	var result sql.Result
+
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
+
+		query, valueList, err := rec.GetInsertDoUpdateQuery()
+		if err != nil {
+			return err
+		}
+
+		result, err = rec.Client.Exec(query, valueList...)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}()
+
+	return result, err
+}
+
 func (rec *Query) InsertIgnore() (sql.Result, error) {
 	var result sql.Result
 
@@ -279,6 +327,14 @@ func (rec *Query) SelectCount(dest interface{}) error {
 
 func (rec *Query) GetInsertQuery() (string, []interface{}, error) {
 	return rec.Value.GetInsertQuery()
+}
+
+func (rec *Query) GetInsertDoNothingQuery() (string, []interface{}, error) {
+	return rec.Value.GetInsertDoNothingQuery()
+}
+
+func (rec *Query) GetInsertDoUpdateQuery() (string, []interface{}, error) {
+	return rec.Value.GetInsertDoUpdateQuery()
 }
 
 func (rec *Query) GetInsertIgnoreQuery() (string, []interface{}, error) {
