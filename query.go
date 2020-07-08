@@ -529,6 +529,12 @@ func (rec *Query) SetValuesClear() {
 	rec.Value.ClearValues()
 }
 
+func (rec *Query) SetConflict(columnPtrList ...interface{}) {
+	for _, val := range columnPtrList {
+		rec.Value.AddConflict(QueryModeDefault, val)
+	}
+}
+
 func (rec *Query) SetSet(columnPtr interface{}, value interface{}) {
 	rec.Value.AddSet(QueryModeDefault, columnPtr, value)
 }
