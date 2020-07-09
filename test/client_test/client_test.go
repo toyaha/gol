@@ -231,59 +231,6 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql insertDoNothing", func(t *testing.T) {
-		db, err := test.NewClientMysql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQuery(&table)
-		query.SetValuesColumn(
-			&table.Str,
-		)
-		query.SetValues(
-			table.Str,
-		)
-		_, err = query.InsertDoNoting()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("mysql insertDoNothing multiple lines", func(t *testing.T) {
-		db, err := test.NewClientMysql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQuery(&table)
-		query.SetValuesColumn(
-			&table.Str,
-		)
-		query.SetValues(
-			table.Str,
-		)
-		query.SetValues(
-			table.Str,
-		)
-		_, err = query.InsertDoNoting()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
 	t.Run("mysql InsertSelectUnion", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
@@ -444,6 +391,59 @@ func TestClient_Exec(t *testing.T) {
 			table.Str,
 		)
 		_, err = query.Insert()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("postgresql InsertDoNothing", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.InsertDoNoting()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("postgresql InsertDoNothing multiple lines", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.InsertDoNoting()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
 			return
