@@ -89,6 +89,7 @@ func (rec *QueryValue) GetInsertQuery() (string, []interface{}, error) {
 	return query, valueList, err
 }
 
+// for mysql
 func (rec *QueryValue) GetInsertDoNothingQuery() (string, []interface{}, error) {
 	var query = "INSERT"
 	var valueList []interface{}

@@ -12,7 +12,7 @@ var (
 )
 
 func TestClient_Exec(t *testing.T) {
-	t.Run("mssql insert", func(t *testing.T) {
+	t.Run("mssql Insert", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -37,7 +37,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mssql insert multiple lines", func(t *testing.T) {
+	t.Run("mssql Insert multiple lines", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -65,7 +65,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mssql insertSelectUnion", func(t *testing.T) {
+	t.Run("mssql InsertSelectUnion", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -90,7 +90,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mssql insertSelectUnion multiple lines", func(t *testing.T) {
+	t.Run("mssql InsertSelectUnion multiple lines", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -118,7 +118,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mssql update", func(t *testing.T) {
+	t.Run("mssql Update", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -139,7 +139,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mssql delete", func(t *testing.T) {
+	t.Run("mssql Delete", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -159,7 +159,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mssql truncate", func(t *testing.T) {
+	t.Run("mssql Truncate", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -178,7 +178,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql insert", func(t *testing.T) {
+	t.Run("mysql Insert", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -203,7 +203,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql insert multiple lines", func(t *testing.T) {
+	t.Run("mysql Insert multiple lines", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -231,7 +231,60 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql insertSelectUnion", func(t *testing.T) {
+	t.Run("mysql insertDoNothing", func(t *testing.T) {
+		db, err := test.NewClientMysql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.InsertDoNoting()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("mysql insertDoNothing multiple lines", func(t *testing.T) {
+		db, err := test.NewClientMysql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.InsertDoNoting()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("mysql InsertSelectUnion", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -256,7 +309,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql insertSelectUnion multiple lines", func(t *testing.T) {
+	t.Run("mysql InsertSelectUnion multiple lines", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -284,7 +337,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql update", func(t *testing.T) {
+	t.Run("mysql Update", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -305,7 +358,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql delete", func(t *testing.T) {
+	t.Run("mysql Delete", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -325,7 +378,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql truncate", func(t *testing.T) {
+	t.Run("mysql Truncate", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -344,7 +397,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql insert", func(t *testing.T) {
+	t.Run("postgresql Insert", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -369,7 +422,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql insert multiple lines", func(t *testing.T) {
+	t.Run("postgresql Insert multiple lines", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -397,7 +450,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql insertSelectUnion", func(t *testing.T) {
+	t.Run("postgresql InsertSelectUnion", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -422,7 +475,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql insertSelectUnion multiple lines", func(t *testing.T) {
+	t.Run("postgresql InsertSelectUnion multiple lines", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -450,7 +503,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql update", func(t *testing.T) {
+	t.Run("postgresql Update", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -471,7 +524,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql delete", func(t *testing.T) {
+	t.Run("postgresql Delete", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -491,7 +544,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql truncate", func(t *testing.T) {
+	t.Run("postgresql Truncate", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -510,7 +563,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql truncate restart identity", func(t *testing.T) {
+	t.Run("postgresql Truncate restart identity", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)

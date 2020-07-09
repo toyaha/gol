@@ -370,6 +370,76 @@ func TestQuery_GetInsertQuery(t *testing.T) {
 	})
 }
 
+func TestQuery_GetInsertDoNothingQuery(t *testing.T) {
+	t.Run("insert a", func(t *testing.T) {
+		query := Query_setAllTypeA()
+
+		str, valueList, err := query.GetInsertDoNothingQuery()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		{
+			target := str
+			check := `INSERT INTO "item" ("create_at", "update_at", "delete_at", "str") VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+		{
+			target := fmt.Sprintf("%v", valueList)
+			var checkList []interface{}
+			checkList = append(checkList, test.TableItem1.CreateAt, test.TableItem1.UpdateAt, test.TableItem1.DeleteAt, test.TableItem1.Str)
+			check := fmt.Sprintf("%v", checkList)
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+	})
+
+	t.Run("insert b", func(t *testing.T) {
+		query := Query_setAllTypeB()
+
+		str, valueList, err := query.GetInsertQuery()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		{
+			target := str
+			check := `INSERT INTO "item" ("create_at", "update_at", "delete_at", "str") VALUES (?, ?, ?, ?), (?, ?, ?, ?)`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+		{
+			target := fmt.Sprintf("%v", valueList)
+			var checkList []interface{}
+			checkList = append(checkList, test.TableItem1.CreateAt, test.TableItem1.UpdateAt, test.TableItem1.DeleteAt, test.TableItem1.Str)
+			checkList = append(checkList, test.TableItem1.CreateAt, test.TableItem1.UpdateAt, test.TableItem1.DeleteAt, test.TableItem1.Str)
+			check := fmt.Sprintf("%v", checkList)
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+	})
+
+	t.Run("error table not exist", func(t *testing.T) {
+		query := gol.NewQuery(nil)
+		_, _, err := query.GetInsertQuery()
+		{
+			target := fmt.Sprintf("%v", err)
+			check := `table not exist`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+				return
+			}
+		}
+	})
+}
+
 func TestQuery_GetInsertSelectUnionQuery(t *testing.T) {
 	t.Run("insert a", func(t *testing.T) {
 		query := Query_setAllTypeA()
