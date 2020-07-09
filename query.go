@@ -197,6 +197,56 @@ func (rec *Query) InsertDoUpdate() (sql.Result, error) {
 	return result, err
 }
 
+// for postgresql
+func (rec *Query) InsertDoUpdateBulk() (sql.Result, error) {
+	var result sql.Result
+
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
+
+		if rec.Config.BulkInsertCount > 0 && rec.Value.GetValuesCount() >= rec.Config.BulkInsertCount {
+			var err error
+			result, err = rec.InsertDoUpdate()
+			if err != nil {
+				return err
+			}
+
+			rec.Value.ClearValues()
+		}
+
+		return nil
+	}()
+
+	return result, err
+}
+
+// for postgresql
+func (rec *Query) InsertDoUpdateBulkFinish() (sql.Result, error) {
+	var result sql.Result
+
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
+
+		if rec.Config.BulkInsertCount > 0 && rec.Value.GetValuesCount() > 0 {
+			var err error
+			result, err = rec.InsertDoUpdate()
+			if err != nil {
+				return err
+			}
+
+			rec.Value.ClearValues()
+		}
+
+		return nil
+	}()
+
+	return result, err
+}
+
 // for mysql
 func (rec *Query) InsertIgnore() (sql.Result, error) {
 	var result sql.Result
