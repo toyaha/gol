@@ -37,7 +37,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mssql insertBulk", func(t *testing.T) {
+	t.Run("mssql insert multiple lines", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -90,7 +90,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mssql insertSelectUnionBulk", func(t *testing.T) {
+	t.Run("mssql insertSelectUnion multiple lines", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -203,7 +203,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql insert bulk", func(t *testing.T) {
+	t.Run("mysql insert multiple lines", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -225,6 +225,59 @@ func TestClient_Exec(t *testing.T) {
 			table.Str,
 		)
 		_, err = query.Insert()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("mysql insertSelectUnion", func(t *testing.T) {
+		db, err := test.NewClientMysql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.InsertSelectUnion()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("mysql insertSelectUnion multiple lines", func(t *testing.T) {
+		db, err := test.NewClientMysql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.InsertSelectUnion()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
 			return
@@ -316,7 +369,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql insert bulk", func(t *testing.T) {
+	t.Run("postgresql insert multiple lines", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -338,6 +391,59 @@ func TestClient_Exec(t *testing.T) {
 			table.Str,
 		)
 		_, err = query.Insert()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("postgresql insertSelectUnion", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.InsertSelectUnion()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("postgresql insertSelectUnion multiple lines", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.InsertSelectUnion()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
 			return
