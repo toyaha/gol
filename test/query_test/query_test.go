@@ -370,6 +370,76 @@ func TestQuery_GetInsertQuery(t *testing.T) {
 	})
 }
 
+func TestQuery_GetInsertSelectUnionQuery(t *testing.T) {
+	t.Run("insert a", func(t *testing.T) {
+		query := Query_setAllTypeA()
+
+		str, valueList, err := query.GetInsertSelectUnionQuery()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		{
+			target := str
+			check := `INSERT INTO "item" ("created_at", "updated_at", "deleted_at", "str") SELECT ?, ?, ?, ?`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+		{
+			target := fmt.Sprintf("%v", valueList)
+			var checkList []interface{}
+			checkList = append(checkList, test.TableItem1.CreatedAt, test.TableItem1.UpdatedAt, test.TableItem1.DeletedAt, test.TableItem1.Str)
+			check := fmt.Sprintf("%v", checkList)
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+	})
+
+	t.Run("insert b", func(t *testing.T) {
+		query := Query_setAllTypeB()
+
+		str, valueList, err := query.GetInsertSelectUnionQuery()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		{
+			target := str
+			check := `INSERT INTO "item" ("created_at", "updated_at", "deleted_at", "str") SELECT ?, ?, ?, ? UNION SELECT ?, ?, ?, ?`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+		{
+			target := fmt.Sprintf("%v", valueList)
+			var checkList []interface{}
+			checkList = append(checkList, test.TableItem1.CreatedAt, test.TableItem1.UpdatedAt, test.TableItem1.DeletedAt, test.TableItem1.Str)
+			checkList = append(checkList, test.TableItem1.CreatedAt, test.TableItem1.UpdatedAt, test.TableItem1.DeletedAt, test.TableItem1.Str)
+			check := fmt.Sprintf("%v", checkList)
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+	})
+
+	t.Run("error table not exist", func(t *testing.T) {
+		query := gol.NewQuery(nil)
+		_, _, err := query.GetInsertQuery()
+		{
+			target := fmt.Sprintf("%v", err)
+			check := `table not exist`
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+				return
+			}
+		}
+	})
+}
+
 func TestQuery_GetUpdateQuery(t *testing.T) {
 	t.Run("update a", func(t *testing.T) {
 		query := Query_setAllTypeA()

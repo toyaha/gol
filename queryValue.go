@@ -329,6 +329,55 @@ func (rec *QueryValue) GetInsertOnDuplicateKeyUpdateQuery() (string, []interface
 	return query, valueList, err
 }
 
+func (rec *QueryValue) GetInsertSelectUnionQuery() (string, []interface{}, error) {
+	var query = "INSERT"
+	var valueList []interface{}
+
+	err := func() error {
+		{
+			str, err := rec.BuildTable()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("table not exist")
+			}
+
+			query = fmt.Sprintf("%v INTO %v", query, str)
+		}
+
+		{
+			str, err := rec.BuildValuesColumn()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, valList, err := rec.BuildValuesSelectUnion()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("values not exist")
+			}
+
+			query = fmt.Sprintf("%v %v", query, str)
+			valueList = append(valueList, valList...)
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
 func (rec *QueryValue) GetUpdateQuery() (string, []interface{}, error) {
 	var query = "UPDATE"
 	var valueList []interface{}
@@ -907,12 +956,40 @@ func (rec *QueryValue) BuildValues() (string, []interface{}, error) {
 				return err
 			}
 
+			str = fmt.Sprintf("(%v)", str)
 			strList = append(strList, str)
 			valueList = append(valueList, valList...)
 		}
 
 		if len(strList) > 0 {
 			query = strings.Join(strList, ", ")
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
+func (rec *QueryValue) BuildValuesSelectUnion() (string, []interface{}, error) {
+	var query string
+	var valueList []interface{}
+
+	err := func() error {
+		var strList []string
+		for _, val := range rec.ValuesList {
+			str, valList, err := val.Build(rec.Meta)
+			if err != nil {
+				return err
+			}
+
+			str = fmt.Sprintf("SELECT %v", str)
+			strList = append(strList, str)
+			valueList = append(valueList, valList...)
+		}
+
+		if len(strList) > 0 {
+			query = strings.Join(strList, " UNION ")
 		}
 
 		return nil
@@ -1639,12 +1716,9 @@ func (rec *QueryValues) Build(_ *Meta) (string, []interface{}, error) {
 			valueList = append(valueList, val)
 		}
 
-		var str string
 		if len(strList) > 0 {
-			str = strings.Join(strList, ", ")
+			query = strings.Join(strList, ", ")
 		}
-
-		query = fmt.Sprintf("(%v)", str)
 
 		return nil
 	}()

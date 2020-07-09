@@ -37,7 +37,7 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
-	t.Run("mssql insert bulk", func(t *testing.T) {
+	t.Run("mssql insertBulk", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -59,6 +59,59 @@ func TestClient_Exec(t *testing.T) {
 			table.Str,
 		)
 		_, err = query.Insert()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("mssql insertSelectUnion", func(t *testing.T) {
+		db, err := test.NewClientMssql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.InsertSelectUnion()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("mssql insertSelectUnionBulk", func(t *testing.T) {
+		db, err := test.NewClientMssql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.InsertSelectUnion()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
 			return
