@@ -269,6 +269,7 @@ func (rec *QueryValue) GetInsertIgnoreQuery() (string, []interface{}, error) {
 	return query, valueList, err
 }
 
+// for mysql
 func (rec *QueryValue) GetInsertOnDuplicateKeyUpdateQuery() (string, []interface{}, error) {
 	var query = "INSERT"
 	var valueList []interface{}

@@ -284,6 +284,66 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
+	t.Run("mysql InsertOnDuprlicateKeyUpdate", func(t *testing.T) {
+		db, err := test.NewClientMysql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Id,
+			&table.Str,
+		)
+		query.SetValues(
+			1,
+			table.Str,
+		)
+		query.SetSet(&table.Str, "duplicate")
+		_, err = query.InsertOnDuplicateKeyUpdate()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("mysql InsertOnDuplicateKeyUpdate multiple lines", func(t *testing.T) {
+		db, err := test.NewClientMysql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Id,
+			&table.Str,
+		)
+		query.SetValues(
+			1,
+			table.Str,
+		)
+		query.SetValues(
+			2,
+			table.Str,
+		)
+		query.SetSet(&table.Str, "duplicate")
+		_, err = query.InsertOnDuplicateKeyUpdate()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
 	t.Run("mysql InsertSelectUnion", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {

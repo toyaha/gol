@@ -172,6 +172,7 @@ func (rec *Query) InsertIgnore() (sql.Result, error) {
 	return result, err
 }
 
+// for mysql
 func (rec *Query) InsertOnDuplicateKeyUpdate() (sql.Result, error) {
 	var result sql.Result
 
