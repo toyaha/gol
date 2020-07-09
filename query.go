@@ -98,7 +98,7 @@ func (rec *Query) InsertBulkFinish() (sql.Result, error) {
 }
 
 // for postgresql
-func (rec *Query) InsertDoNoting() (sql.Result, error) {
+func (rec *Query) InsertDoNothing() (sql.Result, error) {
 	var result sql.Result
 
 	err := func() error {

@@ -528,7 +528,7 @@ func TestClient_Exec(t *testing.T) {
 		query.SetValues(
 			table.Str,
 		)
-		_, err = query.InsertDoNoting()
+		_, err = query.InsertDoNothing()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
 			return
@@ -556,7 +556,7 @@ func TestClient_Exec(t *testing.T) {
 		query.SetValues(
 			table.Str,
 		)
-		_, err = query.InsertDoNoting()
+		_, err = query.InsertDoNothing()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
 			return
