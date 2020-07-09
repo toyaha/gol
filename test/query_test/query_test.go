@@ -56,21 +56,21 @@ func Query_setAllTypeA() *gol.Query {
 	query.SetJoinWhereNestClose(&test.TableItem3)
 
 	query.SetValuesColumn(
-		&test.TableItem1.CreatedAt,
-		&test.TableItem1.UpdatedAt,
-		&test.TableItem1.DeletedAt,
+		&test.TableItem1.CreateAt,
+		&test.TableItem1.UpdateAt,
+		&test.TableItem1.DeleteAt,
 		&test.TableItem1.Str,
 	)
 	query.SetValues(
-		test.TableItem1.CreatedAt,
-		test.TableItem1.UpdatedAt,
-		test.TableItem1.DeletedAt,
+		test.TableItem1.CreateAt,
+		test.TableItem1.UpdateAt,
+		test.TableItem1.DeleteAt,
 		test.TableItem1.Str,
 	)
 
-	query.SetSet(&test.TableItem1.CreatedAt, test.TableItem1.CreatedAt)
-	query.SetSet(&test.TableItem1.UpdatedAt, test.TableItem1.UpdatedAt)
-	query.SetSet(&test.TableItem1.DeletedAt, test.TableItem1.DeletedAt)
+	query.SetSet(&test.TableItem1.CreateAt, test.TableItem1.CreateAt)
+	query.SetSet(&test.TableItem1.UpdateAt, test.TableItem1.UpdateAt)
+	query.SetSet(&test.TableItem1.DeleteAt, test.TableItem1.DeleteAt)
 	query.SetSet(&test.TableItem1.Str, test.TableItem1.Str)
 
 	query.SetSelect(&test.TableItem1.Id)
@@ -199,27 +199,27 @@ func Query_setAllTypeB() *gol.Query {
 	query.SetJoinWhereNestClose(&test.TableItem3)
 
 	query.SetValuesColumn(
-		&test.TableItem1.CreatedAt,
-		&test.TableItem1.UpdatedAt,
-		&test.TableItem1.DeletedAt,
+		&test.TableItem1.CreateAt,
+		&test.TableItem1.UpdateAt,
+		&test.TableItem1.DeleteAt,
 		&test.TableItem1.Str,
 	)
 	query.SetValues(
-		test.TableItem1.CreatedAt,
-		test.TableItem1.UpdatedAt,
-		test.TableItem1.DeletedAt,
+		test.TableItem1.CreateAt,
+		test.TableItem1.UpdateAt,
+		test.TableItem1.DeleteAt,
 		test.TableItem1.Str,
 	)
 	query.SetValues(
-		test.TableItem1.CreatedAt,
-		test.TableItem1.UpdatedAt,
-		test.TableItem1.DeletedAt,
+		test.TableItem1.CreateAt,
+		test.TableItem1.UpdateAt,
+		test.TableItem1.DeleteAt,
 		test.TableItem1.Str,
 	)
 
-	query.SetSet(&test.TableItem1.CreatedAt, test.TableItem1.CreatedAt)
-	query.SetSet(&test.TableItem1.UpdatedAt, test.TableItem1.UpdatedAt)
-	query.SetSet(&test.TableItem1.DeletedAt, test.TableItem1.DeletedAt)
+	query.SetSet(&test.TableItem1.CreateAt, test.TableItem1.CreateAt)
+	query.SetSet(&test.TableItem1.UpdateAt, test.TableItem1.UpdateAt)
+	query.SetSet(&test.TableItem1.DeleteAt, test.TableItem1.DeleteAt)
 	query.SetSet(&test.TableItem1.Str, test.TableItem1.Str)
 
 	query.SetSelect("count(", &test.TableItem1.Id, ")")
@@ -312,7 +312,7 @@ func TestQuery_GetInsertQuery(t *testing.T) {
 
 		{
 			target := str
-			check := `INSERT INTO "item" ("created_at", "updated_at", "deleted_at", "str") VALUES (?, ?, ?, ?)`
+			check := `INSERT INTO "item" ("create_at", "update_at", "delete_at", "str") VALUES (?, ?, ?, ?)`
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
@@ -320,7 +320,7 @@ func TestQuery_GetInsertQuery(t *testing.T) {
 		{
 			target := fmt.Sprintf("%v", valueList)
 			var checkList []interface{}
-			checkList = append(checkList, test.TableItem1.CreatedAt, test.TableItem1.UpdatedAt, test.TableItem1.DeletedAt, test.TableItem1.Str)
+			checkList = append(checkList, test.TableItem1.CreateAt, test.TableItem1.UpdateAt, test.TableItem1.DeleteAt, test.TableItem1.Str)
 			check := fmt.Sprintf("%v", checkList)
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
@@ -339,7 +339,7 @@ func TestQuery_GetInsertQuery(t *testing.T) {
 
 		{
 			target := str
-			check := `INSERT INTO "item" ("created_at", "updated_at", "deleted_at", "str") VALUES (?, ?, ?, ?), (?, ?, ?, ?)`
+			check := `INSERT INTO "item" ("create_at", "update_at", "delete_at", "str") VALUES (?, ?, ?, ?), (?, ?, ?, ?)`
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
@@ -347,8 +347,8 @@ func TestQuery_GetInsertQuery(t *testing.T) {
 		{
 			target := fmt.Sprintf("%v", valueList)
 			var checkList []interface{}
-			checkList = append(checkList, test.TableItem1.CreatedAt, test.TableItem1.UpdatedAt, test.TableItem1.DeletedAt, test.TableItem1.Str)
-			checkList = append(checkList, test.TableItem1.CreatedAt, test.TableItem1.UpdatedAt, test.TableItem1.DeletedAt, test.TableItem1.Str)
+			checkList = append(checkList, test.TableItem1.CreateAt, test.TableItem1.UpdateAt, test.TableItem1.DeleteAt, test.TableItem1.Str)
+			checkList = append(checkList, test.TableItem1.CreateAt, test.TableItem1.UpdateAt, test.TableItem1.DeleteAt, test.TableItem1.Str)
 			check := fmt.Sprintf("%v", checkList)
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
@@ -382,7 +382,7 @@ func TestQuery_GetInsertSelectUnionQuery(t *testing.T) {
 
 		{
 			target := str
-			check := `INSERT INTO "item" ("created_at", "updated_at", "deleted_at", "str") SELECT ?, ?, ?, ?`
+			check := `INSERT INTO "item" ("create_at", "update_at", "delete_at", "str") SELECT ?, ?, ?, ?`
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
@@ -390,7 +390,7 @@ func TestQuery_GetInsertSelectUnionQuery(t *testing.T) {
 		{
 			target := fmt.Sprintf("%v", valueList)
 			var checkList []interface{}
-			checkList = append(checkList, test.TableItem1.CreatedAt, test.TableItem1.UpdatedAt, test.TableItem1.DeletedAt, test.TableItem1.Str)
+			checkList = append(checkList, test.TableItem1.CreateAt, test.TableItem1.UpdateAt, test.TableItem1.DeleteAt, test.TableItem1.Str)
 			check := fmt.Sprintf("%v", checkList)
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
@@ -409,7 +409,7 @@ func TestQuery_GetInsertSelectUnionQuery(t *testing.T) {
 
 		{
 			target := str
-			check := `INSERT INTO "item" ("created_at", "updated_at", "deleted_at", "str") SELECT ?, ?, ?, ? UNION SELECT ?, ?, ?, ?`
+			check := `INSERT INTO "item" ("create_at", "update_at", "delete_at", "str") SELECT ?, ?, ?, ? UNION SELECT ?, ?, ?, ?`
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
@@ -417,8 +417,8 @@ func TestQuery_GetInsertSelectUnionQuery(t *testing.T) {
 		{
 			target := fmt.Sprintf("%v", valueList)
 			var checkList []interface{}
-			checkList = append(checkList, test.TableItem1.CreatedAt, test.TableItem1.UpdatedAt, test.TableItem1.DeletedAt, test.TableItem1.Str)
-			checkList = append(checkList, test.TableItem1.CreatedAt, test.TableItem1.UpdatedAt, test.TableItem1.DeletedAt, test.TableItem1.Str)
+			checkList = append(checkList, test.TableItem1.CreateAt, test.TableItem1.UpdateAt, test.TableItem1.DeleteAt, test.TableItem1.Str)
+			checkList = append(checkList, test.TableItem1.CreateAt, test.TableItem1.UpdateAt, test.TableItem1.DeleteAt, test.TableItem1.Str)
 			check := fmt.Sprintf("%v", checkList)
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
@@ -452,7 +452,7 @@ func TestQuery_GetUpdateQuery(t *testing.T) {
 
 		{
 			target := str
-			check := `UPDATE "item" SET "created_at" = ?, "updated_at" = ?, "deleted_at" = ?, "str" = ? WHERE 1 = 1 AND "item"."id" = ? AND "item"."id" != ? AND "item"."str" LIKE ? AND "item"."str" NOT LIKE ? AND "item"."id" IN (?, ?, ?) AND "item"."id" NOT IN (?, ?, ?) AND "item"."id" > ? AND "item"."id" >= ? AND "item"."id" < ? AND "item"."id" <= ? AND ( 1 = 1 OR "item"."id" = ? OR "item"."id" != ? OR "item"."str" LIKE ? OR "item"."str" NOT LIKE ? OR "item"."id" IN (?, ?, ?) OR "item"."id" NOT IN (?, ?, ?) OR "item"."id" > ? OR "item"."id" >= ? OR "item"."id" < ? OR "item"."id" <= ? ) OR ( 1 = 1 )`
+			check := `UPDATE "item" SET "create_at" = ?, "update_at" = ?, "delete_at" = ?, "str" = ? WHERE 1 = 1 AND "item"."id" = ? AND "item"."id" != ? AND "item"."str" LIKE ? AND "item"."str" NOT LIKE ? AND "item"."id" IN (?, ?, ?) AND "item"."id" NOT IN (?, ?, ?) AND "item"."id" > ? AND "item"."id" >= ? AND "item"."id" < ? AND "item"."id" <= ? AND ( 1 = 1 OR "item"."id" = ? OR "item"."id" != ? OR "item"."str" LIKE ? OR "item"."str" NOT LIKE ? OR "item"."id" IN (?, ?, ?) OR "item"."id" NOT IN (?, ?, ?) OR "item"."id" > ? OR "item"."id" >= ? OR "item"."id" < ? OR "item"."id" <= ? ) OR ( 1 = 1 )`
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			}
@@ -460,7 +460,7 @@ func TestQuery_GetUpdateQuery(t *testing.T) {
 		{
 			target := fmt.Sprintf("%v", valueList)
 			var checkList []interface{}
-			checkList = append(checkList, test.TableItem1.CreatedAt, test.TableItem1.UpdatedAt, test.TableItem1.DeletedAt, test.TableItem1.Str)
+			checkList = append(checkList, test.TableItem1.CreateAt, test.TableItem1.UpdateAt, test.TableItem1.DeleteAt, test.TableItem1.Str)
 			checkList = append(checkList, 201, 202, "wa", "wb", 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, "wc", "wd", 215, 216, 217, 218, 219, 220, 221, 222, 223, 224)
 			check := fmt.Sprintf("%v", checkList)
 			if target != check {

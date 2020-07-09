@@ -50,31 +50,31 @@ var (
 )
 
 type Item struct {
-	Id        int          `json:"id"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
-	DeletedAt gol.NullTime `json:"deleted_at"`
-	Num       int          `json:"num"`
-	Str       string       `json:"str"`
+	Id       int          `column:"id" json:"id"`
+	CreateAt time.Time    `column:"create_at" json:"create_at"`
+	UpdateAt time.Time    `column:"update_at" json:"update_at"`
+	DeleteAt gol.NullTime `column:"delete_at" json:"delete_at"`
+	Num      int          `column:"num" json:"num"`
+	Str      string       `column:"str" json:"str"`
 }
 
 type ItemDetail struct {
-	Id        int           `json:"id"`
-	CreatedAt time.Time     `json:"created_at"`
-	UpdatedAt time.Time     `json:"updated_at"`
-	DeletedAt gol.NullTime  `json:"deleted_at"`
-	ItemId    gol.NullInt64 `json:"item_id"`
-	Num       int           `json:"num"`
-	Str       string        `json:"str"`
+	Id       int           `column:"id" json:"id"`
+	CreateAt time.Time     `column:"create_at" json:"create_at"`
+	UpdateAt time.Time     `column:"update_at" json:"update_at"`
+	DeleteAt gol.NullTime  `column:"delete_at" json:"delete_at"`
+	ItemId   gol.NullInt64 `column:"item_id" json:"item_id"`
+	Num      int           `column:"num" json:"num"`
+	Str      string        `column:"str" json:"str"`
 }
 
 type Tag struct {
-	Id        int          `schema:"PUBLIC" table:"TAG" column:"ID" json:"id"`
-	CreatedAt time.Time    `schema:"PUBLIC" table:"TAG" column:"CREATED_AT" json:"created_at"`
-	UpdatedAt time.Time    `schema:"PUBLIC" table:"TAG" column:"UPDATED_AT" json:"updated_at"`
-	DeletedAt gol.NullTime `schema:"PUBLIC" table:"TAG" column:"DELETED_AT" json:"deleted_at"`
-	Num       string       `schema:"PUBLIC" table:"TAG" column:"NUM" json:"NUM"`
-	Str       string       `schema:"PUBLIC" table:"TAG" column:"STR" json:"STR"`
+	Id       int          `schema:"PUBLIC" table:"TAG" column:"ID" json:"id"`
+	CreateAt time.Time    `schema:"PUBLIC" table:"TAG" column:"CREATE_AT" json:"create_at"`
+	UpdateAt time.Time    `schema:"PUBLIC" table:"TAG" column:"UPDATE_AT" json:"update_at"`
+	DeleteAt gol.NullTime `schema:"PUBLIC" table:"TAG" column:"DELETE_AT" json:"delete_at"`
+	Num      string       `schema:"PUBLIC" table:"TAG" column:"NUM" json:"NUM"`
+	Str      string       `schema:"PUBLIC" table:"TAG" column:"STR" json:"STR"`
 }
 
 func NewClientMssql() (*gol.Client, error) {
