@@ -219,6 +219,7 @@ func (rec *QueryValue) GetInsertDoUpdateQuery() (string, []interface{}, error) {
 	return query, valueList, err
 }
 
+// for mysql
 func (rec *QueryValue) GetInsertIgnoreQuery() (string, []interface{}, error) {
 	var query = "INSERT IGNORE"
 	var valueList []interface{}

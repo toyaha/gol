@@ -231,6 +231,59 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
+	t.Run("mysql InsertIgnore", func(t *testing.T) {
+		db, err := test.NewClientMysql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.InsertIgnore()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("mysql InsertIgnore multiple lines", func(t *testing.T) {
+		db, err := test.NewClientMysql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.InsertIgnore()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
 	t.Run("mysql InsertSelectUnion", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
