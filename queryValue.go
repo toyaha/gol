@@ -141,6 +141,7 @@ func (rec *QueryValue) GetInsertDoNothingQuery() (string, []interface{}, error) 
 	return query, valueList, err
 }
 
+// for postgresql
 func (rec *QueryValue) GetInsertDoUpdateQuery() (string, []interface{}, error) {
 	var query = "INSERT"
 	var valueList []interface{}

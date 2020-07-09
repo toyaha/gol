@@ -450,6 +450,68 @@ func TestClient_Exec(t *testing.T) {
 		}
 	})
 
+	t.Run("postgresql InsertDoUpdate", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Id,
+			&table.Str,
+		)
+		query.SetValues(
+			1,
+			table.Str,
+		)
+		query.SetConflict(&table.Id)
+		query.SetSet(&table.Str, "conflict")
+		_, err = query.InsertDoUpdate()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("postgresql InsertDoUpdate multiple lines", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Id,
+			&table.Str,
+		)
+		query.SetValues(
+			1,
+			table.Str,
+		)
+		query.SetValues(
+			2,
+			table.Str,
+		)
+		query.SetConflict(&table.Id)
+		query.SetSet(&table.Str, "conflict")
+		_, err = query.InsertDoUpdate()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
 	t.Run("postgresql InsertSelectUnion", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {

@@ -122,6 +122,7 @@ func (rec *Query) InsertDoNoting() (sql.Result, error) {
 	return result, err
 }
 
+// for postgresql
 func (rec *Query) InsertDoUpdate() (sql.Result, error) {
 	var result sql.Result
 
