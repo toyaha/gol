@@ -563,10 +563,12 @@ func (rec *QueryValue) GetUpdateQuery() (string, []interface{}, error) {
 				return err
 			}
 
-			if str != "" {
-				query = fmt.Sprintf("%v %v", query, str)
-				valueList = append(valueList, valList...)
+			if str == "" {
+				return errors.New("where not exist")
 			}
+
+			query = fmt.Sprintf("%v %v", query, str)
+			valueList = append(valueList, valList...)
 		}
 
 		return nil
