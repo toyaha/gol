@@ -133,6 +133,8 @@ func TestQueryValue_GetInsertQuery(t *testing.T) {
 		setList := [][]interface{}{
 			{gol.QueryModeDefault, &tableItem1.Num, 5},
 			{gol.QueryModeDefault, &tableItem1.Str, "c"},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id, " + ?", []interface{}{1}},
 		}
 		selectList := [][]interface{}{
 			{gol.QueryModeDefault, "count(", &tableItem1.Id, ")"},
@@ -289,6 +291,8 @@ func TestQueryValue_GetInsertDoNothingQuery(t *testing.T) {
 		setList := [][]interface{}{
 			{gol.QueryModeDefault, &tableItem1.Num, 5},
 			{gol.QueryModeDefault, &tableItem1.Str, "c"},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id, " + ?", []interface{}{1}},
 		}
 		selectList := [][]interface{}{
 			{gol.QueryModeDefault, "count(", &tableItem1.Id, ")"},
@@ -445,6 +449,8 @@ func TestQueryValue_GetInsertDoUpdateQuery(t *testing.T) {
 		setList := [][]interface{}{
 			{gol.QueryModeDefault, &tableItem1.Num, 5},
 			{gol.QueryModeDefault, &tableItem1.Str, "c"},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id, " + ?", []interface{}{1}},
 		}
 		selectList := [][]interface{}{
 			{gol.QueryModeDefault, "count(", &tableItem1.Id, ")"},
@@ -469,8 +475,8 @@ func TestQueryValue_GetInsertDoUpdateQuery(t *testing.T) {
 		limit := 10
 		offset := 100
 		checkList := []string{
-			`INSERT INTO "item" ("id", "str") VALUES (?, ?), (?, ?) ON CONFLICT ("id", "num") DO UPDATE SET "num" = ?, "str" = ?`,
-			"[3 a 4 b 5 c]",
+			`INSERT INTO "item" ("id", "str") VALUES (?, ?), (?, ?) ON CONFLICT ("id", "num") DO UPDATE SET "num" = ?, "str" = ?, "num" = "id", "num" = "id" + ?`,
+			"[3 a 4 b 5 c 1]",
 		}
 		fn(t, tableList, fromList, joinList, joinWhereList, valuesColumnList, valuesList, conflictList, setList, selectList, whereList, groupByList, havingList, orderByList, limit, offset, checkList)
 	})
@@ -601,6 +607,8 @@ func TestQueryValue_GetInsertIgnoreQuery(t *testing.T) {
 		setList := [][]interface{}{
 			{gol.QueryModeDefault, &tableItem1.Num, 5},
 			{gol.QueryModeDefault, &tableItem1.Str, "c"},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id, " + ?", []interface{}{1}},
 		}
 		selectList := [][]interface{}{
 			{gol.QueryModeDefault, "count(", &tableItem1.Id, ")"},
@@ -757,6 +765,8 @@ func TestQueryValue_GetInsertOnDepulicateKeyUpdateQuery(t *testing.T) {
 		setList := [][]interface{}{
 			{gol.QueryModeDefault, &tableItem1.Num, 5},
 			{gol.QueryModeDefault, &tableItem1.Str, "c"},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id, " + ?", []interface{}{1}},
 		}
 		selectList := [][]interface{}{
 			{gol.QueryModeDefault, "count(", &tableItem1.Id, ")"},
@@ -781,8 +791,8 @@ func TestQueryValue_GetInsertOnDepulicateKeyUpdateQuery(t *testing.T) {
 		limit := 10
 		offset := 100
 		checkList := []string{
-			`INSERT INTO "item" ("id", "str") VALUES (?, ?), (?, ?) ON DUPLICATE KEY UPDATE "num" = ?, "str" = ?`,
-			"[3 a 4 b 5 c]",
+			`INSERT INTO "item" ("id", "str") VALUES (?, ?), (?, ?) ON DUPLICATE KEY UPDATE "num" = ?, "str" = ?, "num" = "id", "num" = "id" + ?`,
+			"[3 a 4 b 5 c 1]",
 		}
 		fn(t, tableList, fromList, joinList, joinWhereList, valuesColumnList, valuesList, conflictList, setList, selectList, whereList, groupByList, havingList, orderByList, limit, offset, checkList)
 	})
@@ -913,6 +923,8 @@ func TestQueryValue_GetInsertSelectQuery(t *testing.T) {
 		setList := [][]interface{}{
 			{gol.QueryModeDefault, &tableItem1.Num, 5},
 			{gol.QueryModeDefault, &tableItem1.Str, "c"},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id, " + ?", []interface{}{1}},
 		}
 		selectList := [][]interface{}{
 			{gol.QueryModeDefault, "count(", &tableItem1.Id, ")"},
@@ -1069,6 +1081,8 @@ func TestQueryValue_GetInsertSelectUnionQuery(t *testing.T) {
 		setList := [][]interface{}{
 			{gol.QueryModeDefault, &tableItem1.Num, 5},
 			{gol.QueryModeDefault, &tableItem1.Str, "c"},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id, " + ?", []interface{}{1}},
 		}
 		selectList := [][]interface{}{
 			{gol.QueryModeDefault, "count(", &tableItem1.Id, ")"},
@@ -1225,6 +1239,8 @@ func TestQueryValue_GetUpdateQuery(t *testing.T) {
 		setList := [][]interface{}{
 			{gol.QueryModeDefault, &tableItem1.Num, 5},
 			{gol.QueryModeDefault, &tableItem1.Str, "c"},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id, " + ?", []interface{}{1}},
 		}
 		selectList := [][]interface{}{
 			{gol.QueryModeDefault, "count(", &tableItem1.Id, ")"},
@@ -1249,8 +1265,8 @@ func TestQueryValue_GetUpdateQuery(t *testing.T) {
 		limit := 10
 		offset := 100
 		checkList := []string{
-			`UPDATE "item" SET "num" = ?, "str" = ? WHERE "item"."id" = ? AND "item"."id" = ?`,
-			"[5 c 6 7]",
+			`UPDATE "item" SET "num" = ?, "str" = ?, "num" = "id", "num" = "id" + ? WHERE "item"."id" = ? AND "item"."id" = ?`,
+			"[5 c 1 6 7]",
 		}
 		fn(t, tableList, fromList, joinList, joinWhereList, valuesColumnList, valuesList, conflictList, setList, selectList, whereList, groupByList, havingList, orderByList, limit, offset, checkList)
 	})
@@ -1381,6 +1397,8 @@ func TestQueryValue_GetDeleteQuery(t *testing.T) {
 		setList := [][]interface{}{
 			{gol.QueryModeDefault, &tableItem1.Num, 5},
 			{gol.QueryModeDefault, &tableItem1.Str, "c"},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id, " + ?", []interface{}{1}},
 		}
 		selectList := [][]interface{}{
 			{gol.QueryModeDefault, "count(", &tableItem1.Id, ")"},
@@ -1537,6 +1555,8 @@ func TestQueryValue_GetSelectQuery(t *testing.T) {
 		setList := [][]interface{}{
 			{gol.QueryModeDefault, &tableItem1.Num, 5},
 			{gol.QueryModeDefault, &tableItem1.Str, "c"},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id, " + ?", []interface{}{1}},
 		}
 		selectList := [][]interface{}{
 			{gol.QueryModeDefault, "count(", &tableItem1.Id, ")"},
@@ -1693,6 +1713,8 @@ func TestQueryValue_GetSelectCountQuery(t *testing.T) {
 		setList := [][]interface{}{
 			{gol.QueryModeDefault, &tableItem1.Num, 5},
 			{gol.QueryModeDefault, &tableItem1.Str, "c"},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id, " + ?", []interface{}{1}},
 		}
 		selectList := [][]interface{}{
 			{gol.QueryModeDefault, "count(", &tableItem1.Id, ")"},

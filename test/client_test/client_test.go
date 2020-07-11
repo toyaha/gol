@@ -660,6 +660,7 @@ func TestClient_Update(t *testing.T) {
 
 		table := test.Item{}
 		query := db.NewQuery(&table)
+		query.SetSet(&table.Num, &table.Id, " + ?", []interface{}{1})
 		query.SetSet(&table.Str, "update")
 		query.SetWhereIs(&table.Str, "")
 		_, err = query.Update()
@@ -681,6 +682,7 @@ func TestClient_Update(t *testing.T) {
 
 		table := test.Item{}
 		query := db.NewQuery(&table)
+		query.SetSet(&table.Num, &table.Id, " + ?", []interface{}{1})
 		query.SetSet(&table.Str, "update")
 		query.SetWhereIs(&table.Str, "")
 		_, err = query.Update()
@@ -702,6 +704,7 @@ func TestClient_Update(t *testing.T) {
 
 		table := test.Item{}
 		query := db.NewQuery(&table)
+		query.SetSet(&table.Num, &table.Id, " + ?", []interface{}{1})
 		query.SetSet(&table.Str, "update")
 		query.SetWhereIs(&table.Str, "")
 		_, err = query.Update()

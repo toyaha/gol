@@ -843,8 +843,8 @@ func (rec *Query) SetConflict(columnPtrList ...interface{}) {
 	}
 }
 
-func (rec *Query) SetSet(columnPtr interface{}, value interface{}) {
-	rec.Value.AddSet(QueryModeDefault, columnPtr, value)
+func (rec *Query) SetSet(columnPtr interface{}, valueList ...interface{}) {
+	rec.Value.AddSet(QueryModeDefault, append([]interface{}{columnPtr}, valueList...)...)
 }
 
 func (rec *Query) SetSelect(valueList ...interface{}) {

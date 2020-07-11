@@ -1178,13 +1178,13 @@ func (rec *QueryValue) BuildSet() (string, []interface{}, error) {
 	err := func() error {
 		var strList []string
 		for _, val := range rec.SetList {
-			str, value, err := val.Build(rec.Meta)
+			str, valList, err := val.Build(rec.Meta)
 			if err != nil {
 				return err
 			}
 
 			strList = append(strList, str)
-			valueList = append(valueList, value)
+			valueList = append(valueList, valList...)
 		}
 
 		if len(strList) > 0 {
@@ -1915,25 +1915,50 @@ type QuerySet struct {
 	ValueList []interface{}
 }
 
-func (rec *QuerySet) Build(meta *Meta) (string, interface{}, error) {
+func (rec *QuerySet) Build(meta *Meta) (string, []interface{}, error) {
 	var query string
+	var valueList []interface{}
 
 	err := func() error {
-		if len(rec.ValueList) != 2 {
-			return errors.New(fmt.Sprintf("set length must be 2"))
+		if len(rec.ValueList) < 2 {
+			return errors.New("set length must be greater than 1")
 		}
 
-		data := meta.Get(rec.ValueList[0])
-		if data == nil {
+		var strList []string
+
+		if data := meta.Get(rec.ValueList[0]); data != nil {
+			strList = append(strList, data.Column, " = ")
+		} else {
 			return errors.New("set meta not exist")
 		}
 
-		query = fmt.Sprintf("%v = %v", data.Column, PlaceHolder)
+		if len(rec.ValueList[1:]) == 1 {
+			if data := meta.Get(rec.ValueList[1]); data != nil {
+				strList = append(strList, data.Column)
+			} else {
+				strList = append(strList, PlaceHolder)
+				valueList = append(valueList, rec.ValueList[1])
+			}
+		} else {
+			for _, val := range rec.ValueList[1:] {
+				if fmt.Sprintf("%T", val) == "[]interface {}" {
+					valueList = append(valueList, val.([]interface{})...)
+				} else {
+					if data := meta.Get(val); data != nil {
+						strList = append(strList, data.Column)
+					} else {
+						strList = append(strList, fmt.Sprintf("%v", val))
+					}
+				}
+			}
+		}
+
+		query = strings.Join(strList, "")
 
 		return nil
 	}()
 
-	return query, rec.ValueList[1], err
+	return query, valueList, err
 }
 
 func (rec *QuerySet) Set(mode int, valueList ...interface{}) {

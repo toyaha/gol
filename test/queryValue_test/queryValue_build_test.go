@@ -459,6 +459,36 @@ func TestQueryValue_BuildSet(t *testing.T) {
 		}
 		fn(t, metaList, setList, checkList)
 	})
+
+	t.Run("column", func(t *testing.T) {
+		metaList := [][]interface{}{
+			{&tableItem, true},
+		}
+		setList := [][]interface{}{
+			{gol.QueryModeDefault, &tableItem.Id, &tableItem.Num},
+			{gol.QueryModeDefault, &tableItem.Str, &tableItem.Num},
+		}
+		checkList := []string{
+			`"id" = "num", "str" = "num"`,
+			"[]",
+		}
+		fn(t, metaList, setList, checkList)
+	})
+
+	t.Run("calc", func(t *testing.T) {
+		metaList := [][]interface{}{
+			{&tableItem, true},
+		}
+		setList := [][]interface{}{
+			{gol.QueryModeDefault, &tableItem.Id, &tableItem.Num, " + ?", []interface{}{1}},
+			{gol.QueryModeDefault, &tableItem.Str, &tableItem.Num, " + ?", []interface{}{1}},
+		}
+		checkList := []string{
+			`"id" = "num" + ?, "str" = "num" + ?`,
+			"[1 1]",
+		}
+		fn(t, metaList, setList, checkList)
+	})
 }
 
 func TestQueryValue_BuildSelect(t *testing.T) {

@@ -766,7 +766,7 @@ func TestQuerySet_Build(t *testing.T) {
 		}
 
 		data := &gol.QuerySet{}
-		data.Set(setList[0].(int), setList[1], setList[2])
+		data.Set(setList[0].(int), setList[1:]...)
 
 		query, value, err := data.Build(meta)
 		if err != nil {
@@ -795,10 +795,34 @@ func TestQuerySet_Build(t *testing.T) {
 		metaList := [][]interface{}{
 			{&tableItem, true},
 		}
-		setList := []interface{}{gol.QueryModeDefault, &tableItem.Id, 1}
+		setList := []interface{}{gol.QueryModeDefault, &tableItem.Num, 1}
 		checkList := []string{
-			`"id" = ?`,
-			`1`,
+			`"num" = ?`,
+			`[1]`,
+		}
+		fn(t, metaList, setList, checkList)
+	})
+
+	t.Run("column", func(t *testing.T) {
+		metaList := [][]interface{}{
+			{&tableItem, true},
+		}
+		setList := []interface{}{gol.QueryModeDefault, &tableItem.Num, &tableItem.Id}
+		checkList := []string{
+			`"num" = "id"`,
+			`[]`,
+		}
+		fn(t, metaList, setList, checkList)
+	})
+
+	t.Run("calc", func(t *testing.T) {
+		metaList := [][]interface{}{
+			{&tableItem, true},
+		}
+		setList := []interface{}{gol.QueryModeDefault, &tableItem.Num, &tableItem.Id, " + ?", []interface{}{1}}
+		checkList := []string{
+			`"num" = "id" + ?`,
+			`[1]`,
 		}
 		fn(t, metaList, setList, checkList)
 	})
