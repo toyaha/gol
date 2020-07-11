@@ -73,7 +73,7 @@ func TestQueryValue_BuildTableUseAs(t *testing.T) {
 		tableList := [][]interface{}{
 			{&tableItem, true},
 		}
-		check := `"item" as "t1"`
+		check := `"item" as "t0"`
 		fn(t, tableList, check)
 	})
 }
@@ -118,7 +118,7 @@ func TestQueryValue_BuildFromTableUseAs(t *testing.T) {
 			{&tableItem1, true},
 			{&tableItem2, true},
 		}
-		checkList := []string{`"item" as "t1", "item" as "t2"`, "[]"}
+		checkList := []string{`"item" as "t0", "item" as "t1"`, "[]"}
 		fn(t, fromList, checkList)
 	})
 
@@ -127,7 +127,7 @@ func TestQueryValue_BuildFromTableUseAs(t *testing.T) {
 			{&tableItem1, true, "(select 1, ?)", []interface{}{2}},
 			{&tableItem2, true, "(select 3, ?)", []interface{}{4}},
 		}
-		checkList := []string{`(select 1, ?) as "t1", (select 3, ?) as "t2"`, "[2 4]"}
+		checkList := []string{`(select 1, ?) as "t0", (select 3, ?) as "t1"`, "[2 4]"}
 		fn(t, fromList, checkList)
 	})
 }
@@ -196,7 +196,7 @@ func TestQueryValue_BuildJoinUseAs(t *testing.T) {
 		}
 		checkList := []string{
 			fmt.Sprintf(
-				`INNER JOIN "item" as "t2" ON "t2"."id" = "t1"."id" AND "t2"."id" = ? LEFT JOIN "item" as "t3" ON "t3"."id" = "t1"."id" AND "t3"."id" = ? RIGHT JOIN "PUBLIC"."TAG" as "t4" ON "t4"."ID" = "t1"."id" AND "t4"."ID" = ?`,
+				`INNER JOIN "item" as "t1" ON "t1"."id" = "t0"."id" AND "t1"."id" = ? LEFT JOIN "item" as "t2" ON "t2"."id" = "t0"."id" AND "t2"."id" = ? RIGHT JOIN "PUBLIC"."TAG" as "t3" ON "t3"."ID" = "t0"."id" AND "t3"."ID" = ?`,
 			),
 			"[1 2 3]",
 		}
@@ -591,7 +591,7 @@ func TestQueryValue_BuildSelectUseAs(t *testing.T) {
 			{gol.QueryModeDefault, &tableItem.Str},
 		}
 		checkList := []string{
-			`SELECT count("t1"."id"), "t1"."str", "t1"."str"`,
+			`SELECT count("t0"."id"), "t0"."str", "t0"."str"`,
 			"[]",
 		}
 		fn(t, metaList, selectList, checkList)
@@ -605,7 +605,7 @@ func TestQueryValue_BuildSelectUseAs(t *testing.T) {
 			{gol.QueryModeAll, &tableItem},
 		}
 		checkList := []string{
-			`SELECT "t1".*`,
+			`SELECT "t0".*`,
 			"[]",
 		}
 		fn(t, metaList, selectList, checkList)
@@ -780,7 +780,7 @@ func TestQueryValue_BuildWhereUseAs(t *testing.T) {
 			{gol.QueryModeNestClose, gol.QueryPrefixOr},
 		}
 		checkList := []string{
-			`WHERE "t1"."id" = ? AND "t1"."id" = ? AND "t1"."id" != ? AND "t1"."str" LIKE ? AND "t1"."str" NOT LIKE ? AND "t1"."id" IN (?, ?, ?) AND "t1"."id" NOT IN (?, ?, ?) AND "t1"."id" > ? AND "t1"."id" >= ? AND "t1"."id" < ? AND "t1"."id" <= ? AND ( count("t1"."id") = ? ? ) OR "t2"."ID" = ? OR "t2"."ID" != ? OR "t2"."STR" LIKE ? OR "t2"."STR" NOT LIKE ? OR "t2"."ID" IN (?, ?, ?) OR "t2"."ID" NOT IN (?, ?, ?) OR "t2"."ID" > ? OR "t2"."ID" >= ? OR "t2"."ID" < ? OR "t2"."ID" <= ? OR ( count("t2"."ID") = ? ? )`,
+			`WHERE "t0"."id" = ? AND "t0"."id" = ? AND "t0"."id" != ? AND "t0"."str" LIKE ? AND "t0"."str" NOT LIKE ? AND "t0"."id" IN (?, ?, ?) AND "t0"."id" NOT IN (?, ?, ?) AND "t0"."id" > ? AND "t0"."id" >= ? AND "t0"."id" < ? AND "t0"."id" <= ? AND ( count("t0"."id") = ? ? ) OR "t1"."ID" = ? OR "t1"."ID" != ? OR "t1"."STR" LIKE ? OR "t1"."STR" NOT LIKE ? OR "t1"."ID" IN (?, ?, ?) OR "t1"."ID" NOT IN (?, ?, ?) OR "t1"."ID" > ? OR "t1"."ID" >= ? OR "t1"."ID" < ? OR "t1"."ID" <= ? OR ( count("t1"."ID") = ? ? )`,
 			"[0 1 2 a b 3 4 5 6 7 8 9 10 11 12 13 14 15 16 c d 17 18 19 20 21 22 23 24 25 26 27 28]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -864,7 +864,7 @@ func TestQueryValue_BuildGroupByUseAs(t *testing.T) {
 			{gol.QueryModeDefault, &tableItem.Id},
 			{gol.QueryModeDefault, &tableItem.Str},
 		}
-		check := `GROUP BY "t1"."id", "t1"."str"`
+		check := `GROUP BY "t0"."id", "t0"."str"`
 		fn(t, metaList, groupByList, check)
 	})
 }
@@ -1022,7 +1022,7 @@ func TestQueryValue_BuildHavingUseAs(t *testing.T) {
 			{gol.QueryModeNestClose, gol.QueryPrefixOr},
 		}
 		checkList := []string{
-			`HAVING "t1"."id" = ? AND "t1"."id" = ? AND "t1"."id" != ? AND "t1"."str" LIKE ? AND "t1"."str" NOT LIKE ? AND "t1"."id" IN (?, ?, ?) AND "t1"."id" NOT IN (?, ?, ?) AND "t1"."id" > ? AND "t1"."id" >= ? AND "t1"."id" < ? AND "t1"."id" <= ? AND ( count("t1"."id") = ? ? ) OR "t2"."ID" = ? OR "t2"."ID" != ? OR "t2"."STR" LIKE ? OR "t2"."STR" NOT LIKE ? OR "t2"."ID" IN (?, ?, ?) OR "t2"."ID" NOT IN (?, ?, ?) OR "t2"."ID" > ? OR "t2"."ID" >= ? OR "t2"."ID" < ? OR "t2"."ID" <= ? OR ( count("t2"."ID") = ? ? )`,
+			`HAVING "t0"."id" = ? AND "t0"."id" = ? AND "t0"."id" != ? AND "t0"."str" LIKE ? AND "t0"."str" NOT LIKE ? AND "t0"."id" IN (?, ?, ?) AND "t0"."id" NOT IN (?, ?, ?) AND "t0"."id" > ? AND "t0"."id" >= ? AND "t0"."id" < ? AND "t0"."id" <= ? AND ( count("t0"."id") = ? ? ) OR "t1"."ID" = ? OR "t1"."ID" != ? OR "t1"."STR" LIKE ? OR "t1"."STR" NOT LIKE ? OR "t1"."ID" IN (?, ?, ?) OR "t1"."ID" NOT IN (?, ?, ?) OR "t1"."ID" > ? OR "t1"."ID" >= ? OR "t1"."ID" < ? OR "t1"."ID" <= ? OR ( count("t1"."ID") = ? ? )`,
 			"[0 1 2 a b 3 4 5 6 7 8 9 10 11 12 13 14 15 16 c d 17 18 19 20 21 22 23 24 25 26 27 28]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -1108,7 +1108,7 @@ func TestQueryValue_BuildOrderByUseAs(t *testing.T) {
 			{gol.QueryModeAsc, &tableItem.Str},
 			{gol.QueryModeDesc, &tableItem.Str},
 		}
-		check := `ORDER BY count("t1"."id"), "t1"."str" ASC, "t1"."str" DESC`
+		check := `ORDER BY count("t0"."id"), "t0"."str" ASC, "t0"."str" DESC`
 		fn(t, metaList, orderByList, check)
 	})
 }

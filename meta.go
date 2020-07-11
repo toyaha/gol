@@ -47,8 +47,9 @@ func (rec *Meta) Add(tablePtr interface{}, useAs bool) error {
 		if !useAs {
 			return ""
 		}
+		str := fmt.Sprintf("t%v", rec.Count)
 		rec.Count++
-		return fmt.Sprintf("t%v", rec.Count)
+		return str
 	}()
 
 	numField := tableType.NumField()

@@ -333,6 +333,149 @@ func (rec *QueryValue) GetInsertOnDuplicateKeyUpdateQuery() (string, []interface
 	return query, valueList, err
 }
 
+func (rec *QueryValue) GetInsertSelectQuery() (string, []interface{}, error) {
+	var query = "INSERT"
+	var valueList []interface{}
+
+	err := func() error {
+		{
+			str, err := rec.BuildTable()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("table not exist")
+			}
+
+			query = fmt.Sprintf("%v INTO %v", query, str)
+		}
+
+		{
+			str, err := rec.BuildValuesColumn()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		if len(rec.FromList) < 1 {
+			return errors.New("from not exist")
+		}
+
+		{
+			str, valList, err := rec.BuildSelectUseAs()
+			if err != nil {
+				return err
+			}
+
+			if str == "" {
+				return errors.New("select not exist")
+			}
+
+			query = fmt.Sprintf("%v %v", query, str)
+			valueList = append(valueList, valList...)
+		}
+
+		{
+			str, valList, err := rec.BuildFromUseAs()
+			if err != nil {
+				return err
+			}
+
+			query = fmt.Sprintf("%v FROM %v", query, str)
+			valueList = append(valueList, valList...)
+		}
+
+		{
+			str, valList, err := rec.BuildJoinUseAs()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+				valueList = append(valueList, valList...)
+			}
+		}
+
+		{
+			str, valList, err := rec.BuildWhereUseAs()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+				valueList = append(valueList, valList...)
+			}
+		}
+
+		{
+			str, err := rec.BuildGroupByUseAs()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, valList, err := rec.BuildHavingUseAs()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+				valueList = append(valueList, valList...)
+			}
+		}
+
+		{
+			str, err := rec.BuildOrderByUseAs()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, err := rec.BuildLimit()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		{
+			str, err := rec.BuildOffset()
+			if err != nil {
+				return err
+			}
+
+			if str != "" {
+				query = fmt.Sprintf("%v %v", query, str)
+			}
+		}
+
+		return nil
+	}()
+
+	return query, valueList, err
+}
+
 func (rec *QueryValue) GetInsertSelectUnionQuery() (string, []interface{}, error) {
 	var query = "INSERT"
 	var valueList []interface{}

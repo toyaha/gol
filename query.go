@@ -397,6 +397,30 @@ func (rec *Query) InsertOnDuplicateKeyUpdateBulkFinish() (sql.Result, error) {
 	return result, err
 }
 
+func (rec *Query) InsertSelect() (sql.Result, error) {
+	var result sql.Result
+
+	err := func() error {
+		if rec.Client == nil {
+			return errors.New("database does not exist")
+		}
+
+		query, valueList, err := rec.GetInsertSelectQuery()
+		if err != nil {
+			return err
+		}
+
+		result, err = rec.Client.Exec(query, valueList...)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}()
+
+	return result, err
+}
+
 func (rec *Query) InsertSelectUnion() (sql.Result, error) {
 	var result sql.Result
 
@@ -619,6 +643,10 @@ func (rec *Query) GetInsertIgnoreQuery() (string, []interface{}, error) {
 
 func (rec *Query) GetInsertOnDuplicateKeyUpdateQuery() (string, []interface{}, error) {
 	return rec.Value.GetInsertOnDuplicateKeyUpdateQuery()
+}
+
+func (rec *Query) GetInsertSelectQuery() (string, []interface{}, error) {
+	return rec.Value.GetInsertSelectQuery()
 }
 
 func (rec *Query) GetInsertSelectUnionQuery() (string, []interface{}, error) {

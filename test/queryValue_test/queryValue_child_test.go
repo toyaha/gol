@@ -81,7 +81,7 @@ func TestQueryTable_BuildUseAs(t *testing.T) {
 		tableList := [][]interface{}{
 			{&tableItem, true},
 		}
-		check := `"item" as "t1"`
+		check := `"item" as "t0"`
 		fn(t, tableList, check)
 	})
 }
@@ -129,7 +129,7 @@ func TestQueryFrom_BuildUseAs(t *testing.T) {
 		fromList := [][]interface{}{
 			{&tableItem, true},
 		}
-		checkList := []string{`"item" as "t1"`, "[]"}
+		checkList := []string{`"item" as "t0"`, "[]"}
 		fn(t, fromList, checkList)
 	})
 
@@ -137,7 +137,7 @@ func TestQueryFrom_BuildUseAs(t *testing.T) {
 		fromList := [][]interface{}{
 			{&tableItem, true, "(select 1)"},
 		}
-		checkList := []string{`(select 1) as "t1"`, "[]"}
+		checkList := []string{`(select 1) as "t0"`, "[]"}
 		fn(t, fromList, checkList)
 	})
 }
@@ -185,7 +185,7 @@ func TestQueryJoin_BuildUseAs(t *testing.T) {
 		joinList := [][][]interface{}{
 			{{&tableItem1, true}, {gol.QueryJoinModeInner, &tableItem1}},
 		}
-		checkList := []string{`INNER JOIN "item" as "t1" ON`, "[]"}
+		checkList := []string{`INNER JOIN "item" as "t0" ON`, "[]"}
 		fn(t, joinList, checkList)
 	})
 
@@ -193,7 +193,7 @@ func TestQueryJoin_BuildUseAs(t *testing.T) {
 		joinList := [][][]interface{}{
 			{{&tableItem1, true}, {gol.QueryJoinModeLeft, &tableItem1}},
 		}
-		checkList := []string{`LEFT JOIN "item" as "t1" ON`, "[]"}
+		checkList := []string{`LEFT JOIN "item" as "t0" ON`, "[]"}
 		fn(t, joinList, checkList)
 	})
 
@@ -201,7 +201,7 @@ func TestQueryJoin_BuildUseAs(t *testing.T) {
 		joinList := [][][]interface{}{
 			{{&tableItem1, true}, {gol.QueryJoinModeRight, &tableItem1}},
 		}
-		checkList := []string{`RIGHT JOIN "item" as "t1" ON`, "[]"}
+		checkList := []string{`RIGHT JOIN "item" as "t0" ON`, "[]"}
 		fn(t, joinList, checkList)
 	})
 
@@ -209,7 +209,7 @@ func TestQueryJoin_BuildUseAs(t *testing.T) {
 		joinList := [][][]interface{}{
 			{{&tableItem1, true}, {gol.QueryJoinModeInner, &tableItem1, "(select ?)", []interface{}{1}}},
 		}
-		checkList := []string{`INNER JOIN (select ?) as "t1" ON`, "[1]"}
+		checkList := []string{`INNER JOIN (select ?) as "t0" ON`, "[1]"}
 		fn(t, joinList, checkList)
 	})
 }
@@ -265,7 +265,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeDefault, gol.QueryPrefixAnd, &tableItem1, &tableItem1.Id, " = ?", []interface{}{1}}
 		checkList := []string{
 			"AND",
-			`"t1"."id" = ?`,
+			`"t0"."id" = ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -279,7 +279,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeIs, gol.QueryPrefixAnd, &tableItem1, &tableItem1.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" = ?`,
+			`"t0"."id" = ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -293,7 +293,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeIsNot, gol.QueryPrefixAnd, &tableItem1, &tableItem1.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" != ?`,
+			`"t0"."id" != ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -307,7 +307,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeLike, gol.QueryPrefixAnd, &tableItem1, &tableItem1.Str, "a"}
 		checkList := []string{
 			"AND",
-			`"t1"."str" LIKE ?`,
+			`"t0"."str" LIKE ?`,
 			"[a]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -321,7 +321,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeLikeNot, gol.QueryPrefixAnd, &tableItem1, &tableItem1.Str, "a"}
 		checkList := []string{
 			"AND",
-			`"t1"."str" NOT LIKE ?`,
+			`"t0"."str" NOT LIKE ?`,
 			"[a]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -335,7 +335,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeIn, gol.QueryPrefixAnd, &tableItem1, &tableItem1.Id, []interface{}{1, 2, 3}}
 		checkList := []string{
 			"AND",
-			`"t1"."id" IN (?, ?, ?)`,
+			`"t0"."id" IN (?, ?, ?)`,
 			"[1 2 3]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -349,7 +349,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeInNot, gol.QueryPrefixAnd, &tableItem1, &tableItem1.Id, []interface{}{1, 2, 3}}
 		checkList := []string{
 			"AND",
-			`"t1"."id" NOT IN (?, ?, ?)`,
+			`"t0"."id" NOT IN (?, ?, ?)`,
 			"[1 2 3]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -363,7 +363,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeGt, gol.QueryPrefixAnd, &tableItem1, &tableItem1.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" > ?`,
+			`"t0"."id" > ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -377,7 +377,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeGte, gol.QueryPrefixAnd, &tableItem1, &tableItem1.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" >= ?`,
+			`"t0"."id" >= ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -391,7 +391,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeLt, gol.QueryPrefixAnd, &tableItem1, &tableItem1.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" < ?`,
+			`"t0"."id" < ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -405,7 +405,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeLte, gol.QueryPrefixAnd, &tableItem1, &tableItem1.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" <= ?`,
+			`"t0"."id" <= ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -419,7 +419,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeDefault, gol.QueryPrefixOr, &tableItem1, &tableItem1.Id, " = ?", []interface{}{1}}
 		checkList := []string{
 			"OR",
-			`"t1"."id" = ?`,
+			`"t0"."id" = ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -433,7 +433,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeIs, gol.QueryPrefixOr, &tableItem1, &tableItem1.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" = ?`,
+			`"t0"."id" = ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -447,7 +447,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeIsNot, gol.QueryPrefixOr, &tableItem1, &tableItem1.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" != ?`,
+			`"t0"."id" != ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -461,7 +461,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeLike, gol.QueryPrefixOr, &tableItem1, &tableItem1.Str, "a"}
 		checkList := []string{
 			"OR",
-			`"t1"."str" LIKE ?`,
+			`"t0"."str" LIKE ?`,
 			"[a]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -475,7 +475,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeLikeNot, gol.QueryPrefixOr, &tableItem1, &tableItem1.Str, "a"}
 		checkList := []string{
 			"OR",
-			`"t1"."str" NOT LIKE ?`,
+			`"t0"."str" NOT LIKE ?`,
 			"[a]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -489,7 +489,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeIn, gol.QueryPrefixOr, &tableItem1, &tableItem1.Id, []interface{}{1, 2, 3}}
 		checkList := []string{
 			"OR",
-			`"t1"."id" IN (?, ?, ?)`,
+			`"t0"."id" IN (?, ?, ?)`,
 			"[1 2 3]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -503,7 +503,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeInNot, gol.QueryPrefixOr, &tableItem1, &tableItem1.Id, []interface{}{1, 2, 3}}
 		checkList := []string{
 			"OR",
-			`"t1"."id" NOT IN (?, ?, ?)`,
+			`"t0"."id" NOT IN (?, ?, ?)`,
 			"[1 2 3]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -517,7 +517,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeGt, gol.QueryPrefixOr, &tableItem1, &tableItem1.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" > ?`,
+			`"t0"."id" > ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -531,7 +531,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeGte, gol.QueryPrefixOr, &tableItem1, &tableItem1.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" >= ?`,
+			`"t0"."id" >= ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -545,7 +545,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeLt, gol.QueryPrefixOr, &tableItem1, &tableItem1.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" < ?`,
+			`"t0"."id" < ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -559,7 +559,7 @@ func TestQueryJoinWhere_BuildUseAs(t *testing.T) {
 		joinWhereList := []interface{}{gol.QueryModeLte, gol.QueryPrefixOr, &tableItem1, &tableItem1.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" <= ?`,
+			`"t0"."id" <= ?`,
 			"[1]",
 		}
 		fn(t, metaList, joinWhereList, checkList)
@@ -915,7 +915,7 @@ func TestQuerySelect_BuildUseAs(t *testing.T) {
 			{&tableItem, true},
 		}
 		selectList := []interface{}{gol.QueryModeDefault, "count(", &tableItem.Id, ")"}
-		checkList := []string{`count("t1"."id")`, "[]"}
+		checkList := []string{`count("t0"."id")`, "[]"}
 		fn(t, metaList, selectList, checkList)
 	})
 
@@ -924,7 +924,7 @@ func TestQuerySelect_BuildUseAs(t *testing.T) {
 			{&tableItem, true},
 		}
 		selectList := []interface{}{gol.QueryModeAll, &tableItem}
-		checkList := []string{`"t1".*`, "[]"}
+		checkList := []string{`"t0".*`, "[]"}
 		fn(t, metaList, selectList, checkList)
 	})
 
@@ -1355,7 +1355,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeDefault, gol.QueryPrefixAnd, &tableItem.Id, " = ?", []interface{}{1}}
 		checkList := []string{
 			"AND",
-			`"t1"."id" = ?`,
+			`"t0"."id" = ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1368,7 +1368,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeIs, gol.QueryPrefixAnd, &tableItem.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" = ?`,
+			`"t0"."id" = ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1381,7 +1381,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeIsNot, gol.QueryPrefixAnd, &tableItem.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" != ?`,
+			`"t0"."id" != ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1394,7 +1394,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeLike, gol.QueryPrefixAnd, &tableItem.Str, "a"}
 		checkList := []string{
 			"AND",
-			`"t1"."str" LIKE ?`,
+			`"t0"."str" LIKE ?`,
 			"[a]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1407,7 +1407,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeLikeNot, gol.QueryPrefixAnd, &tableItem.Str, "a"}
 		checkList := []string{
 			"AND",
-			`"t1"."str" NOT LIKE ?`,
+			`"t0"."str" NOT LIKE ?`,
 			"[a]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1420,7 +1420,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeIn, gol.QueryPrefixAnd, &tableItem.Id, []interface{}{1, 2, 3}}
 		checkList := []string{
 			"AND",
-			`"t1"."id" IN (?, ?, ?)`,
+			`"t0"."id" IN (?, ?, ?)`,
 			"[1 2 3]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1433,7 +1433,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeInNot, gol.QueryPrefixAnd, &tableItem.Id, []interface{}{1, 2, 3}}
 		checkList := []string{
 			"AND",
-			`"t1"."id" NOT IN (?, ?, ?)`,
+			`"t0"."id" NOT IN (?, ?, ?)`,
 			"[1 2 3]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1446,7 +1446,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeGt, gol.QueryPrefixAnd, &tableItem.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" > ?`,
+			`"t0"."id" > ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1459,7 +1459,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeGte, gol.QueryPrefixAnd, &tableItem.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" >= ?`,
+			`"t0"."id" >= ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1472,7 +1472,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeLt, gol.QueryPrefixAnd, &tableItem.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" < ?`,
+			`"t0"."id" < ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1485,7 +1485,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeLte, gol.QueryPrefixAnd, &tableItem.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" <= ?`,
+			`"t0"."id" <= ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1498,7 +1498,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeDefault, gol.QueryPrefixOr, &tableItem.Id, " = ?", []interface{}{1}}
 		checkList := []string{
 			"OR",
-			`"t1"."id" = ?`,
+			`"t0"."id" = ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1511,7 +1511,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeIs, gol.QueryPrefixOr, &tableItem.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" = ?`,
+			`"t0"."id" = ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1524,7 +1524,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeIsNot, gol.QueryPrefixOr, &tableItem.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" != ?`,
+			`"t0"."id" != ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1537,7 +1537,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeLike, gol.QueryPrefixOr, &tableItem.Str, "a"}
 		checkList := []string{
 			"OR",
-			`"t1"."str" LIKE ?`,
+			`"t0"."str" LIKE ?`,
 			"[a]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1550,7 +1550,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeLikeNot, gol.QueryPrefixOr, &tableItem.Str, "a"}
 		checkList := []string{
 			"OR",
-			`"t1"."str" NOT LIKE ?`,
+			`"t0"."str" NOT LIKE ?`,
 			"[a]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1563,7 +1563,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeIn, gol.QueryPrefixOr, &tableItem.Id, []interface{}{1, 2, 3}}
 		checkList := []string{
 			"OR",
-			`"t1"."id" IN (?, ?, ?)`,
+			`"t0"."id" IN (?, ?, ?)`,
 			"[1 2 3]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1576,7 +1576,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeInNot, gol.QueryPrefixOr, &tableItem.Id, []interface{}{1, 2, 3}}
 		checkList := []string{
 			"OR",
-			`"t1"."id" NOT IN (?, ?, ?)`,
+			`"t0"."id" NOT IN (?, ?, ?)`,
 			"[1 2 3]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1589,7 +1589,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeGt, gol.QueryPrefixOr, &tableItem.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" > ?`,
+			`"t0"."id" > ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1602,7 +1602,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeGte, gol.QueryPrefixOr, &tableItem.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" >= ?`,
+			`"t0"."id" >= ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1615,7 +1615,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeLt, gol.QueryPrefixOr, &tableItem.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" < ?`,
+			`"t0"."id" < ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1628,7 +1628,7 @@ func TestQueryWhere_BuildUseAs(t *testing.T) {
 		whereList := []interface{}{gol.QueryModeLte, gol.QueryPrefixOr, &tableItem.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" <= ?`,
+			`"t0"."id" <= ?`,
 			"[1]",
 		}
 		fn(t, metaList, whereList, checkList)
@@ -1749,7 +1749,7 @@ func TestQueryGroupBy_BuildUseAs(t *testing.T) {
 			{&tableItem, true},
 		}
 		groupByList := []interface{}{gol.QueryModeDefault, &tableItem.Id}
-		check := `"t1"."id"`
+		check := `"t0"."id"`
 		fn(t, metaList, groupByList, check)
 	})
 }
@@ -2171,7 +2171,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeDefault, gol.QueryPrefixAnd, &tableItem.Id, " = ?", []interface{}{1}}
 		checkList := []string{
 			"AND",
-			`"t1"."id" = ?`,
+			`"t0"."id" = ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2184,7 +2184,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeIs, gol.QueryPrefixAnd, &tableItem.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" = ?`,
+			`"t0"."id" = ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2197,7 +2197,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeIsNot, gol.QueryPrefixAnd, &tableItem.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" != ?`,
+			`"t0"."id" != ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2210,7 +2210,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeLike, gol.QueryPrefixAnd, &tableItem.Str, "a"}
 		checkList := []string{
 			"AND",
-			`"t1"."str" LIKE ?`,
+			`"t0"."str" LIKE ?`,
 			"[a]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2223,7 +2223,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeLikeNot, gol.QueryPrefixAnd, &tableItem.Str, "a"}
 		checkList := []string{
 			"AND",
-			`"t1"."str" NOT LIKE ?`,
+			`"t0"."str" NOT LIKE ?`,
 			"[a]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2236,7 +2236,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeIn, gol.QueryPrefixAnd, &tableItem.Id, []interface{}{1, 2, 3}}
 		checkList := []string{
 			"AND",
-			`"t1"."id" IN (?, ?, ?)`,
+			`"t0"."id" IN (?, ?, ?)`,
 			"[1 2 3]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2249,7 +2249,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeInNot, gol.QueryPrefixAnd, &tableItem.Id, []interface{}{1, 2, 3}}
 		checkList := []string{
 			"AND",
-			`"t1"."id" NOT IN (?, ?, ?)`,
+			`"t0"."id" NOT IN (?, ?, ?)`,
 			"[1 2 3]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2262,7 +2262,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeGt, gol.QueryPrefixAnd, &tableItem.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" > ?`,
+			`"t0"."id" > ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2275,7 +2275,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeGte, gol.QueryPrefixAnd, &tableItem.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" >= ?`,
+			`"t0"."id" >= ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2288,7 +2288,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeLt, gol.QueryPrefixAnd, &tableItem.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" < ?`,
+			`"t0"."id" < ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2301,7 +2301,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeLte, gol.QueryPrefixAnd, &tableItem.Id, 1}
 		checkList := []string{
 			"AND",
-			`"t1"."id" <= ?`,
+			`"t0"."id" <= ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2314,7 +2314,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeDefault, gol.QueryPrefixOr, &tableItem.Id, " = ?", []interface{}{1}}
 		checkList := []string{
 			"OR",
-			`"t1"."id" = ?`,
+			`"t0"."id" = ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2327,7 +2327,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeIs, gol.QueryPrefixOr, &tableItem.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" = ?`,
+			`"t0"."id" = ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2340,7 +2340,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeIsNot, gol.QueryPrefixOr, &tableItem.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" != ?`,
+			`"t0"."id" != ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2353,7 +2353,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeLike, gol.QueryPrefixOr, &tableItem.Str, "a"}
 		checkList := []string{
 			"OR",
-			`"t1"."str" LIKE ?`,
+			`"t0"."str" LIKE ?`,
 			"[a]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2366,7 +2366,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeLikeNot, gol.QueryPrefixOr, &tableItem.Str, "a"}
 		checkList := []string{
 			"OR",
-			`"t1"."str" NOT LIKE ?`,
+			`"t0"."str" NOT LIKE ?`,
 			"[a]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2379,7 +2379,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeIn, gol.QueryPrefixOr, &tableItem.Id, []interface{}{1, 2, 3}}
 		checkList := []string{
 			"OR",
-			`"t1"."id" IN (?, ?, ?)`,
+			`"t0"."id" IN (?, ?, ?)`,
 			"[1 2 3]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2392,7 +2392,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeInNot, gol.QueryPrefixOr, &tableItem.Id, []interface{}{1, 2, 3}}
 		checkList := []string{
 			"OR",
-			`"t1"."id" NOT IN (?, ?, ?)`,
+			`"t0"."id" NOT IN (?, ?, ?)`,
 			"[1 2 3]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2405,7 +2405,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeGt, gol.QueryPrefixOr, &tableItem.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" > ?`,
+			`"t0"."id" > ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2418,7 +2418,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeGte, gol.QueryPrefixOr, &tableItem.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" >= ?`,
+			`"t0"."id" >= ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2431,7 +2431,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeLt, gol.QueryPrefixOr, &tableItem.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" < ?`,
+			`"t0"."id" < ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2444,7 +2444,7 @@ func TestQueryHaving_BuildUseAs(t *testing.T) {
 		havingList := []interface{}{gol.QueryModeLte, gol.QueryPrefixOr, &tableItem.Id, 1}
 		checkList := []string{
 			"OR",
-			`"t1"."id" <= ?`,
+			`"t0"."id" <= ?`,
 			"[1]",
 		}
 		fn(t, metaList, havingList, checkList)
@@ -2583,7 +2583,7 @@ func TestQueryOrderBy_BuildUseAs(t *testing.T) {
 			{&tableItem, true},
 		}
 		orderByList := []interface{}{gol.QueryModeDefault, "count(", &tableItem.Id, ")"}
-		check := `count("t1"."id")`
+		check := `count("t0"."id")`
 		fn(t, metaList, orderByList, check)
 	})
 
@@ -2592,7 +2592,7 @@ func TestQueryOrderBy_BuildUseAs(t *testing.T) {
 			{&tableItem, true},
 		}
 		orderByList := []interface{}{gol.QueryModeAsc, "count(", &tableItem.Id, ")"}
-		check := `count("t1"."id") ASC`
+		check := `count("t0"."id") ASC`
 		fn(t, metaList, orderByList, check)
 	})
 
@@ -2601,7 +2601,7 @@ func TestQueryOrderBy_BuildUseAs(t *testing.T) {
 			{&tableItem, true},
 		}
 		orderByList := []interface{}{gol.QueryModeDesc, "count(", &tableItem.Id, ")"}
-		check := `count("t1"."id") DESC`
+		check := `count("t0"."id") DESC`
 		fn(t, metaList, orderByList, check)
 	})
 }

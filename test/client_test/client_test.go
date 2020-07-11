@@ -408,6 +408,84 @@ func TestClient_InsertOnDuplicateKeyUpdate(t *testing.T) {
 	})
 }
 
+func TestClient_InsertSelect(t *testing.T) {
+	t.Run("mssql InsertSelect", func(t *testing.T) {
+		db, err := test.NewClientMssql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		table2 := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetFrom(&table2)
+		query.SetSelect(&table2.Str)
+		_, err = query.InsertSelect()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("mysql InsertSelect", func(t *testing.T) {
+		db, err := test.NewClientMysql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		table2 := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetFrom(&table2)
+		query.SetSelect(&table2.Str)
+		query.Config.Log = true
+		_, err = query.InsertSelect()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("postgresql InsertSelect", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		table2 := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetFrom(&table2)
+		query.SetSelect(&table2.Str)
+		_, err = query.InsertSelect()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+}
+
 func TestClient_InsertSelectUnion(t *testing.T) {
 	t.Run("mssql InsertSelectUnion", func(t *testing.T) {
 		db, err := test.NewClientMssql()
