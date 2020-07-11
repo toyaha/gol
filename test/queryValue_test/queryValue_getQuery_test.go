@@ -1343,7 +1343,9 @@ func TestQueryValue_GetDeleteQuery(t *testing.T) {
 
 		query, valueList, err := queryValue.GetDeleteQuery()
 		if err != nil {
-			t.Error(err)
+			if checkList[0] != fmt.Sprintf("%v", err) {
+				t.Error(err)
+			}
 			return
 		}
 
@@ -1425,6 +1427,35 @@ func TestQueryValue_GetDeleteQuery(t *testing.T) {
 		checkList := []string{
 			`DELETE FROM "item" WHERE "item"."id" = ? AND "item"."id" = ?`,
 			"[6 7]",
+		}
+		fn(t, tableList, fromList, joinList, joinWhereList, valuesColumnList, valuesList, conflictList, setList, selectList, whereList, groupByList, havingList, orderByList, limit, offset, checkList)
+	})
+
+	t.Run("where not exist", func(t *testing.T) {
+		tableList := [][]interface{}{
+			{&tableItem1, true},
+		}
+		fromList := [][]interface{}{}
+		joinList := [][][]interface{}{}
+		joinWhereList := [][]interface{}{}
+		valuesColumnList := [][]interface{}{}
+		valuesList := [][]interface{}{}
+		conflictList := [][]interface{}{}
+		setList := [][]interface{}{
+			{gol.QueryModeDefault, &tableItem1.Num, 5},
+			{gol.QueryModeDefault, &tableItem1.Str, "c"},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id},
+			{gol.QueryModeDefault, &tableItem1.Num, &tableItem1.Id, " + ?", []interface{}{1}},
+		}
+		selectList := [][]interface{}{}
+		whereList := [][]interface{}{}
+		groupByList := [][]interface{}{}
+		havingList := [][]interface{}{}
+		orderByList := [][]interface{}{}
+		limit := 10
+		offset := 100
+		checkList := []string{
+			`where not exist`,
 		}
 		fn(t, tableList, fromList, joinList, joinWhereList, valuesColumnList, valuesList, conflictList, setList, selectList, whereList, groupByList, havingList, orderByList, limit, offset, checkList)
 	})

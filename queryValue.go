@@ -585,9 +585,11 @@ func (rec *QueryValue) GetDeleteQuery() (string, []interface{}, error) {
 			if err != nil {
 				return err
 			}
+
 			if str == "" {
 				return errors.New("table not exist")
 			}
+
 			query = fmt.Sprintf("%v FROM %v", query, str)
 		}
 
@@ -596,10 +598,13 @@ func (rec *QueryValue) GetDeleteQuery() (string, []interface{}, error) {
 			if err != nil {
 				return err
 			}
-			if str != "" {
-				query = fmt.Sprintf("%v %v", query, str)
-				valueList = append(valueList, valList...)
+
+			if str == "" {
+				return errors.New("where not exist")
 			}
+
+			query = fmt.Sprintf("%v %v", query, str)
+			valueList = append(valueList, valList...)
 		}
 
 		return nil
