@@ -12,7 +12,7 @@ var (
 )
 
 func TestClient_Insert(t *testing.T) {
-	t.Run("mssql Insert", func(t *testing.T) {
+	t.Run("Insert mssql", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -37,7 +37,7 @@ func TestClient_Insert(t *testing.T) {
 		}
 	})
 
-	t.Run("mssql Insert multiple lines", func(t *testing.T) {
+	t.Run("Insert mssql multiple lines", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -65,60 +65,7 @@ func TestClient_Insert(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql Insert", func(t *testing.T) {
-		db, err := test.NewClientPostgresql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQuery(&table)
-		query.SetValuesColumn(
-			&table.Str,
-		)
-		query.SetValues(
-			table.Str,
-		)
-		_, err = query.Insert()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("postgresql Insert multiple lines", func(t *testing.T) {
-		db, err := test.NewClientPostgresql()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-		defer func() {
-			_ = db.Close()
-		}()
-
-		table := test.Item{}
-		query := db.NewQuery(&table)
-		query.SetValuesColumn(
-			&table.Str,
-		)
-		query.SetValues(
-			table.Str,
-		)
-		query.SetValues(
-			table.Str,
-		)
-		_, err = query.Insert()
-		if err != nil {
-			t.Errorf("\nerror: %v", err)
-			return
-		}
-	})
-
-	t.Run("mysql Insert", func(t *testing.T) {
+	t.Run("Insert mysql", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -143,8 +90,61 @@ func TestClient_Insert(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql Insert multiple lines", func(t *testing.T) {
+	t.Run("Insert mysql multiple lines", func(t *testing.T) {
 		db, err := test.NewClientMysql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.Insert()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("Insert postgresql", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		table := test.Item{}
+		query := db.NewQuery(&table)
+		query.SetValuesColumn(
+			&table.Str,
+		)
+		query.SetValues(
+			table.Str,
+		)
+		_, err = query.Insert()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+	})
+
+	t.Run("Insert postgresql multiple lines", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
 			return
@@ -173,7 +173,7 @@ func TestClient_Insert(t *testing.T) {
 }
 
 func TestClient_InsertDoNothing(t *testing.T) {
-	t.Run("postgresql InsertDoNothing", func(t *testing.T) {
+	t.Run("InsertDoNothing postgresql", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -198,7 +198,7 @@ func TestClient_InsertDoNothing(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql InsertDoNothing multiple lines", func(t *testing.T) {
+	t.Run("InsertDoNothing postgresql multiple lines", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -228,7 +228,7 @@ func TestClient_InsertDoNothing(t *testing.T) {
 }
 
 func TestClient_InsertDoUpdate(t *testing.T) {
-	t.Run("postgresql InsertDoUpdate", func(t *testing.T) {
+	t.Run("InsertDoUpdate postgresql", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -257,7 +257,7 @@ func TestClient_InsertDoUpdate(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql InsertDoUpdate multiple lines", func(t *testing.T) {
+	t.Run("InsertDoUpdate postgresql multiple lines", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -292,7 +292,7 @@ func TestClient_InsertDoUpdate(t *testing.T) {
 }
 
 func TestClient_InsertIgnore(t *testing.T) {
-	t.Run("mysql InsertIgnore", func(t *testing.T) {
+	t.Run("InsertIgnore mysql", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -317,7 +317,7 @@ func TestClient_InsertIgnore(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql InsertIgnore multiple lines", func(t *testing.T) {
+	t.Run("InsertIgnore mysql multiple lines", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -347,7 +347,7 @@ func TestClient_InsertIgnore(t *testing.T) {
 }
 
 func TestClient_InsertOnDuplicateKeyUpdate(t *testing.T) {
-	t.Run("mysql InsertOnDuplicateKeyUpdate", func(t *testing.T) {
+	t.Run("InsertOnDuplicateKeyUpdate mysql", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -375,7 +375,7 @@ func TestClient_InsertOnDuplicateKeyUpdate(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql InsertOnDuplicateKeyUpdate multiple lines", func(t *testing.T) {
+	t.Run("InsertOnDuplicateKeyUpdate mysql multiple lines", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -409,7 +409,7 @@ func TestClient_InsertOnDuplicateKeyUpdate(t *testing.T) {
 }
 
 func TestClient_InsertSelect(t *testing.T) {
-	t.Run("mssql InsertSelect", func(t *testing.T) {
+	t.Run("InsertSelect mssql", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -434,7 +434,7 @@ func TestClient_InsertSelect(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql InsertSelect", func(t *testing.T) {
+	t.Run("InsertSelect mysql", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -460,7 +460,7 @@ func TestClient_InsertSelect(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql InsertSelect", func(t *testing.T) {
+	t.Run("InsertSelect postgresql", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -487,7 +487,7 @@ func TestClient_InsertSelect(t *testing.T) {
 }
 
 func TestClient_InsertSelectUnion(t *testing.T) {
-	t.Run("mssql InsertSelectUnion", func(t *testing.T) {
+	t.Run("InsertSelectUnion mssql", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -512,7 +512,7 @@ func TestClient_InsertSelectUnion(t *testing.T) {
 		}
 	})
 
-	t.Run("mssql InsertSelectUnion multiple lines", func(t *testing.T) {
+	t.Run("InsertSelectUnion mssql multiple lines", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -540,7 +540,7 @@ func TestClient_InsertSelectUnion(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql InsertSelectUnion", func(t *testing.T) {
+	t.Run("InsertSelectUnion mysql", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -565,7 +565,7 @@ func TestClient_InsertSelectUnion(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql InsertSelectUnion multiple lines", func(t *testing.T) {
+	t.Run("InsertSelectUnion mysql multiple lines", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -593,7 +593,7 @@ func TestClient_InsertSelectUnion(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql InsertSelectUnion", func(t *testing.T) {
+	t.Run("InsertSelectUnion postgresql", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -618,7 +618,7 @@ func TestClient_InsertSelectUnion(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql InsertSelectUnion multiple lines", func(t *testing.T) {
+	t.Run("InsertSelectUnion postgresql multiple lines", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -648,7 +648,7 @@ func TestClient_InsertSelectUnion(t *testing.T) {
 }
 
 func TestClient_Update(t *testing.T) {
-	t.Run("mssql Update", func(t *testing.T) {
+	t.Run("Update mssql", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -669,7 +669,7 @@ func TestClient_Update(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql Update", func(t *testing.T) {
+	t.Run("Update mysql", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -690,7 +690,7 @@ func TestClient_Update(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql Update", func(t *testing.T) {
+	t.Run("Update postgresql", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -713,7 +713,7 @@ func TestClient_Update(t *testing.T) {
 }
 
 func TestClient_Delete(t *testing.T) {
-	t.Run("mssql Delete", func(t *testing.T) {
+	t.Run("Delete mssql", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -733,7 +733,7 @@ func TestClient_Delete(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql Delete", func(t *testing.T) {
+	t.Run("Delete mysql", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -753,7 +753,7 @@ func TestClient_Delete(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql Delete", func(t *testing.T) {
+	t.Run("Delete postgresql", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -775,7 +775,7 @@ func TestClient_Delete(t *testing.T) {
 }
 
 func TestClient_Truncate(t *testing.T) {
-	t.Run("mssql Truncate", func(t *testing.T) {
+	t.Run("Truncate mssql", func(t *testing.T) {
 		db, err := test.NewClientMssql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -794,7 +794,7 @@ func TestClient_Truncate(t *testing.T) {
 		}
 	})
 
-	t.Run("mysql Truncate", func(t *testing.T) {
+	t.Run("Truncate mysql", func(t *testing.T) {
 		db, err := test.NewClientMysql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -813,7 +813,7 @@ func TestClient_Truncate(t *testing.T) {
 		}
 	})
 
-	t.Run("postgresql Truncate", func(t *testing.T) {
+	t.Run("Truncate postgresql", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -834,7 +834,7 @@ func TestClient_Truncate(t *testing.T) {
 }
 
 func TestClient_TruncateRestartIdentity(t *testing.T) {
-	t.Run("postgresql TruncateRestartIdentity", func(t *testing.T) {
+	t.Run("TruncateRestartIdentity postgresql", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -1036,7 +1036,7 @@ func TestClient_Meta(t *testing.T) {
 		}
 	}
 
-	t.Run("item", func(t *testing.T) {
+	t.Run("Meta item", func(t *testing.T) {
 		var table interface{} = &tableItem
 		var field interface{} = &tableItem.Str
 		var checkMap = map[string]string{
@@ -1059,7 +1059,7 @@ func TestClient_Meta(t *testing.T) {
 		fn(t, table, field, checkMap)
 	})
 
-	t.Run("tag", func(t *testing.T) {
+	t.Run("Meta tag", func(t *testing.T) {
 		var table interface{} = &tableTag
 		var field interface{} = &tableTag.Str
 		var checkMap = map[string]string{
