@@ -11,6 +11,80 @@ var (
 	timeNow = time.Now()
 )
 
+func TestClient_QueryRow(t *testing.T) {
+	t.Run("mssql", func(t *testing.T) {
+		db, err := test.NewClientMssql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var str string
+		err = db.QueryRow(`SELECT 'abcde'`).Scan(&str)
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+
+		target := "abcde"
+		check := str
+		if target != check {
+			t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+		}
+	})
+
+	t.Run("mysql", func(t *testing.T) {
+		db, err := test.NewClientMysql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var str string
+		err = db.QueryRow(`SELECT 'abcde'`).Scan(&str)
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+
+		target := "abcde"
+		check := str
+		if target != check {
+			t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+		}
+	})
+
+	t.Run("postgresql", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var str string
+		err = db.QueryRow(`SELECT 'abcde'`).Scan(&str)
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+
+		target := "abcde"
+		check := str
+		if target != check {
+			t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+		}
+	})
+}
+
 func TestClient_Insert(t *testing.T) {
 	t.Run("Insert mssql", func(t *testing.T) {
 		db, err := test.NewClientMssql()

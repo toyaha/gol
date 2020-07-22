@@ -260,11 +260,37 @@ func (rec *Client) Query(query string, valueList ...interface{}) (*sql.Rows, err
 	if err != nil {
 		return nil, err
 	}
-	if rec.DB == nil && rec.TX == nil {
-		return nil, errors.New("database is null")
-	}
 
 	return rows, nil
+}
+
+func (rec *Client) QueryRow(query string, valueList ...interface{}) *Row {
+	var row = NewRow()
+
+	if rec.DB == nil && rec.TX == nil {
+		return row
+	}
+
+	switch rec.Config.DatabaseType {
+	case DatabaseTypeMssql:
+		query = ChangeQueryForMssql(query)
+		valueList = ChangeValueListForMssql(valueList...)
+	case DatabaseTypePostgresql:
+		query = ChangeQueryForPostgresql(query)
+	}
+
+	if rec.Config.Log {
+		fmt.Printf("query: %v\n", query)
+		fmt.Printf("value: %v\n", valueList)
+	}
+
+	if rec.TX != nil {
+		row.Row = rec.TX.QueryRow(query, valueList...)
+	} else {
+		row.Row = rec.DB.QueryRow(query, valueList...)
+	}
+
+	return row
 }
 
 func (rec *Client) Find(dest interface{}, query string, valueList ...interface{}) error {
