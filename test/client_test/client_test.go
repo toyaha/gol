@@ -526,7 +526,6 @@ func TestClient_InsertSelect(t *testing.T) {
 		)
 		query.SetFrom(&table2)
 		query.SetSelect(&table2.Str)
-		query.Config.Log = true
 		_, err = query.InsertSelect()
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
