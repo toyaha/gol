@@ -307,6 +307,20 @@ func (rec *Client) Find(dest interface{}, query string, valueList ...interface{}
 	return nil
 }
 
+func (rec *Client) FindRow(dest interface{}, query string, valueList ...interface{}) error {
+	rows, err := rec.Query(query, valueList...)
+	if err != nil {
+		return err
+	}
+
+	err = rec.ExtractRow(dest, rows)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (rec *Client) ExtractRows(dest interface{}, rows *sql.Rows) error {
 	if rows == nil {
 		return errors.New("rows is nil")
