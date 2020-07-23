@@ -15,3 +15,7 @@
 # editor
 .idea/
 .vscode
+
+
+# gol
+/test/test_test.go
