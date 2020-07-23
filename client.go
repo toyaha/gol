@@ -323,7 +323,7 @@ func (rec *Client) FindRow(dest interface{}, query string, valueList ...interfac
 
 func (rec *Client) ExtractRows(dest interface{}, rows *sql.Rows) error {
 	if rows == nil {
-		return errors.New("rows is nil")
+		return errors.New("rows not exist")
 	}
 	defer func() {
 		_ = rows.Close()
@@ -334,91 +334,70 @@ func (rec *Client) ExtractRows(dest interface{}, rows *sql.Rows) error {
 		return err
 	}
 
-	destValue := reflect.ValueOf(dest)
-	var destValueType string
-	destDirect := reflect.Indirect(destValue)
-	var base reflect.Type
+	var destType = reflect.TypeOf(dest)
+	var destValue = reflect.ValueOf(dest)
+	var destDirect = reflect.Indirect(destValue)
+	if destType.Kind() != reflect.Ptr {
+		return errors.New("type must be *[]struct or *[]*struct or *[]map[string]interface {}")
+	}
+
+	var originType reflect.Type
+	var destTypeName string
+
 	{
-		ty := destValue.Type()
-		if ty.Kind() != reflect.Ptr {
-			return errors.New("dest is not pointer. Should be type *[]struct or *[]*struct or *[]map[string]interface {}")
+		typ := destType.Elem()
+		if typ.Kind() != reflect.Slice {
+			return errors.New("type must be *[]struct or *[]*struct or *[]map[string]interface {}")
 		}
-		ty = ty.Elem()
-		base = ty.Elem()
-		switch ty.Kind() {
-		case reflect.Slice:
-			if base.Kind() == reflect.Ptr {
-				base = base.Elem()
-				if base.Kind() != reflect.Struct {
-					return errors.New("dest is not pointer. Should be type *[]struct or *[]*struct or *[]map[string]interface {}")
-				}
-				destValueType = "*[]*struct"
-			} else {
-				if base.Kind() == reflect.Struct {
-					destValueType = "*[]struct"
-				} else {
-					destValueType = destValue.Type().String()
-					switch destValueType {
-					case "*[]map[string]interface {}":
-					default:
-						return errors.New("dest is not pointer. Should be type *[]struct or *[]*struct or *[]map[string]interface {}")
-					}
-				}
+
+		typ = typ.Elem()
+		switch typ.Kind() {
+		case reflect.Ptr:
+			typ = typ.Elem()
+			if typ.Kind() != reflect.Struct {
+				return errors.New("type must be type *[]struct or *[]*struct or *[]map[string]interface {}")
 			}
+			originType = typ
+			destTypeName = "*[]*struct"
+		case reflect.Struct:
+			originType = typ
+			destTypeName = "*[]struct"
 		case reflect.Map:
-			destValueType = destValue.Type().String()
+			originType = typ
+			destTypeName = destValue.Type().String()
 		default:
-			return errors.New("dest is not pointer. Should be type *[]struct or *[]*struct or *[]map[string]interface {}")
+			return errors.New("type must be *[]struct or *[]*struct or *[]map[string]interface {}")
 		}
 	}
 
-	switch destValueType {
+	switch destTypeName {
 	case "*[]*struct", "*[]struct":
-		var tagIndexMap map[string][]int
+		var columnIndexList [][]int
 		{
-			tagIndexMap, err = makeTagIndexMap(base, StructFieldTagNameColumn)
+			tagIndexMap, err := makeTagIndexMap(originType, StructFieldTagNameColumn)
 			if err != nil {
 				return err
 			}
 
-			if len(tagIndexMap) != len(columnList) {
-				tagIndexMapFlag := true
-				for _, column := range columnList {
-					_, ok := tagIndexMap[column]
-					if !ok {
-						tagIndexMapFlag = true
-						break
-					}
-					tagIndexMapFlag = false
+			for _, val := range columnList {
+				indexList, ok := tagIndexMap[val]
+				if !ok {
+					return errors.New(fmt.Sprintf("not found column %v", val))
 				}
-				if tagIndexMapFlag {
-					baseValue := reflect.New(base)
-					val := reflect.Indirect(baseValue)
-					if val.NumField() != len(columnList) {
-						return errors.New("length does not match")
-					}
-					for key, column := range columnList {
-						tagIndexMap[column] = []int{key}
-					}
-				}
+
+				columnIndexList = append(columnIndexList, indexList)
 			}
 		}
 
 		scanList := make([]interface{}, len(columnList))
-		if destValueType == "*[]*struct" {
+
+		if destTypeName == "*[]struct" {
 			for rows.Next() {
-				baseValue := reflect.New(base)
-				val := reflect.Indirect(baseValue)
-
-				for key, column := range columnList {
-					indexList, ok := tagIndexMap[column]
-					if !ok {
-						return errors.New("column not exist")
-					}
-
-					field := val
-					for _, index := range indexList {
-						field = field.Field(index)
+				direct := reflect.Indirect(reflect.New(originType))
+				for key := range columnList {
+					field := direct
+					for _, v := range columnIndexList[key] {
+						field = field.Field(v)
 					}
 
 					scanList[key] = field.Addr().Interface()
@@ -429,22 +408,15 @@ func (rec *Client) ExtractRows(dest interface{}, rows *sql.Rows) error {
 					return err
 				}
 
-				destDirect.Set(reflect.Append(destDirect, val.Addr()))
+				destDirect.Set(reflect.Append(destDirect, direct))
 			}
 		} else {
 			for rows.Next() {
-				baseValue := reflect.New(base)
-				val := reflect.Indirect(baseValue)
-
-				for key, column := range columnList {
-					indexList, ok := tagIndexMap[column]
-					if !ok {
-						return errors.New("column not exist")
-					}
-
-					field := val
-					for _, index := range indexList {
-						field = field.Field(index)
+				direct := reflect.Indirect(reflect.New(originType))
+				for key := range columnList {
+					field := direct
+					for _, v := range columnIndexList[key] {
+						field = field.Field(v)
 					}
 
 					scanList[key] = field.Addr().Interface()
@@ -455,15 +427,10 @@ func (rec *Client) ExtractRows(dest interface{}, rows *sql.Rows) error {
 					return err
 				}
 
-				destDirect.Set(reflect.Append(destDirect, val))
+				destDirect.Set(reflect.Append(destDirect, direct.Addr()))
 			}
 		}
 	case "*[]map[string]interface {}":
-		columnChangeMap := make(map[string]string)
-		for _, val := range columnList {
-			columnChangeMap[val] = val
-		}
-
 		var valList = make([]interface{}, len(columnList))
 		var scanList = make([]interface{}, len(columnList))
 		for key := range columnList {
@@ -478,15 +445,21 @@ func (rec *Client) ExtractRows(dest interface{}, rows *sql.Rows) error {
 
 			scanMap := make(map[string]interface{})
 			for key, column := range columnList {
-				name := columnChangeMap[column]
-				scanMap[name] = valList[key]
+				scanMap[column] = valList[key]
 			}
 
-			scanMapType := reflect.ValueOf(scanMap)
-			destDirect.Set(reflect.Append(destDirect, scanMapType))
+			destDirect.Set(reflect.Append(destDirect, reflect.ValueOf(scanMap)))
 		}
 	default:
-		return errors.New("type *[]struct or *[]*struct or *[]map[string]interface{}")
+		return errors.New("type must be type *[]struct or *[]*struct or *[]map[string]interface {}")
+	}
+
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	if err := rows.Close(); err != nil {
+		return err
 	}
 
 	return nil
