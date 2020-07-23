@@ -478,6 +478,93 @@ func (rec *Client) ExtractRows(dest interface{}, rows *sql.Rows) error {
 	return nil
 }
 
+func (rec *Client) ExtractRow(dest interface{}, rows *sql.Rows) error {
+	if rows == nil {
+		return errors.New("rows not exist")
+	}
+	defer func() {
+		_ = rows.Close()
+	}()
+
+	for !rows.Next() {
+		return errors.New(fmt.Sprintf("number of lines is not 1"))
+	}
+
+	columnList, err := rows.Columns()
+	if err != nil {
+		return err
+	}
+
+	var destType = reflect.TypeOf(dest)
+	var destValue = reflect.ValueOf(dest)
+	if destType.Kind() != reflect.Ptr {
+		return errors.New("type must be type *struct or *map[string]interface {}")
+	}
+
+	var originType = destType.Elem()
+	var originValue = destValue.Elem()
+
+	var destTypeName string
+	if originType.Kind() == reflect.Struct {
+		destTypeName = "*struct"
+	} else {
+		return errors.New("type must be type *struct or *map[string]interface {}")
+	}
+
+	switch destTypeName {
+	case "*struct":
+		var columnIndexList [][]int
+		{
+			tagIndexMap, err := makeTagIndexMap(originType, StructFieldTagNameColumn)
+			if err != nil {
+				return err
+			}
+
+			for _, val := range columnList {
+				indexList, ok := tagIndexMap[val]
+				if !ok {
+					return errors.New(fmt.Sprintf("not found column %v", val))
+				}
+
+				columnIndexList = append(columnIndexList, indexList)
+			}
+		}
+
+		scanList := make([]interface{}, len(columnList))
+
+		direct := reflect.Indirect(originValue)
+		for key := range columnList {
+			field := direct
+			for _, v := range columnIndexList[key] {
+				field = field.Field(v)
+			}
+
+			scanList[key] = field.Addr().Interface()
+		}
+
+		err = rows.Scan(scanList...)
+		if err != nil {
+			return err
+		}
+	default:
+		return errors.New("type must be type *struct or *map[string]interface {}")
+	}
+
+	if rows.Next() {
+		return errors.New(fmt.Sprintf("Number of lines is not 1"))
+	}
+
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	if err := rows.Close(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (rec *Client) Close() error {
 	if rec.Config.Test {
 		return nil

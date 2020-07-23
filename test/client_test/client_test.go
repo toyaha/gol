@@ -1,6 +1,7 @@
 package client_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -79,6 +80,33 @@ func TestClient_QueryRow(t *testing.T) {
 
 		target := "abcde"
 		check := str
+		if target != check {
+			t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+		}
+	})
+}
+
+func TestClient_ExtractRow(t *testing.T) {
+	t.Run("ok", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var result = &test.Item{}
+		rows, err := db.Query("select 1 as id")
+		err = db.ExtractRow(result, rows)
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+
+		target := fmt.Sprintf("%v", result.Id)
+		check := fmt.Sprintf("%v", 1)
 		if target != check {
 			t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 		}
