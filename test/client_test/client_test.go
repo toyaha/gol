@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/toyaha/gol"
 	"github.com/toyaha/gol/test"
 )
 
@@ -12,6 +13,79 @@ var (
 	timeNow = time.Now()
 )
 
+func TestClient_Query(t *testing.T) {
+	fn := func(db *gol.Client, checkList []string) {
+		rows, err := db.Query(`SELECT 1 AS id UNION SELECT 2`)
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = rows.Close()
+		}()
+
+		key := 0
+		for rows.Next() {
+			var row int
+			err := rows.Scan(&row)
+			if err != nil {
+				t.Errorf("\nerror: %v", err)
+				return
+			}
+
+			target := fmt.Sprintf("%+v", row)
+			check := checkList[key]
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+				return
+			}
+
+			key++
+		}
+	}
+
+	t.Run("mssql", func(t *testing.T) {
+		db, err := test.NewClientMssql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var checkList = []string{"1", "2"}
+		fn(db, checkList)
+	})
+
+	t.Run("mysql", func(t *testing.T) {
+		db, err := test.NewClientMysql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var checkList = []string{"1", "2"}
+		fn(db, checkList)
+	})
+
+	t.Run("postgresql", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var checkList = []string{"1", "2"}
+		fn(db, checkList)
+	})
+}
 func TestClient_QueryRow(t *testing.T) {
 	t.Run("mssql", func(t *testing.T) {
 		db, err := test.NewClientMssql()
