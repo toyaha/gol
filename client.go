@@ -371,7 +371,7 @@ func (rec *Client) ExtractRows(dest interface{}, rows *sql.Rows) error {
 	}
 
 	switch destTypeName {
-	case "*[]*struct", "*[]struct":
+	case "*[]struct", "*[]*struct":
 		var columnIndexList [][]int
 		{
 			tagIndexMap, err := makeTagIndexMap(originType, StructFieldTagNameColumn)
@@ -492,9 +492,12 @@ func (rec *Client) ExtractRow(dest interface{}, rows *sql.Rows) error {
 	var originValue = destValue.Elem()
 
 	var destTypeName string
-	if originType.Kind() == reflect.Struct {
+	switch originType.Kind() {
+	case reflect.Struct:
 		destTypeName = "*struct"
-	} else {
+	case reflect.Map:
+		destTypeName = destValue.Type().String()
+	default:
 		return errors.New("type must be type *struct or *map[string]interface {}")
 	}
 
@@ -532,6 +535,21 @@ func (rec *Client) ExtractRow(dest interface{}, rows *sql.Rows) error {
 		err = rows.Scan(scanList...)
 		if err != nil {
 			return err
+		}
+	case "*map[string]interface {}":
+		var scanList = make([]interface{}, len(columnList))
+		var valList = make([]interface{}, len(columnList))
+		for key := range columnList {
+			scanList[key] = &valList[key]
+		}
+
+		err = rows.Scan(scanList...)
+		if err != nil {
+			return err
+		}
+
+		for key, column := range columnList {
+			originValue.SetMapIndex(reflect.ValueOf(column), reflect.ValueOf(valList[key]))
 		}
 	default:
 		return errors.New("type must be type *struct or *map[string]interface {}")

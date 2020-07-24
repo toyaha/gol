@@ -593,6 +593,7 @@ func TestClient_ExtractRows(t *testing.T) {
 			check := checkList[key]
 			if target != check {
 				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+				return
 			}
 		}
 	})
@@ -669,8 +670,15 @@ func TestClient_ExtractRow(t *testing.T) {
 		var result = make(map[string]interface{}, 0)
 		rows, err := db.Query("SELECT 1 AS id")
 		err = db.ExtractRow(&result, rows)
-		if err == nil {
-			t.Errorf("\nerror not found")
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+
+		target := fmt.Sprintf("%v", result["id"])
+		check := fmt.Sprintf("%v", 1)
+		if target != check {
+			t.Errorf("\ntarget: %v\ncheck : %v", target, check)
 			return
 		}
 	})
@@ -716,6 +724,7 @@ func TestClient_ExtractRow(t *testing.T) {
 		check := fmt.Sprintf("%v", 1)
 		if target != check {
 			t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			return
 		}
 	})
 
