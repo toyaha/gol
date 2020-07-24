@@ -86,6 +86,161 @@ func TestClient_QueryRow(t *testing.T) {
 	})
 }
 
+func TestClient_Find(t *testing.T) {
+	t.Run("int", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var resultList int
+		err = db.Find(&resultList, "SELECT 1 AS id UNION SELECT 2")
+		if err == nil {
+			t.Errorf("\nerror not found")
+			return
+		}
+	})
+
+	t.Run("*int", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var resultList int
+		err = db.Find(&resultList, "SELECT 1 AS id UNION SELECT 2")
+		if err == nil {
+			t.Errorf("\nerror not found")
+			return
+		}
+	})
+
+	t.Run("struct", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var resultList test.Item
+		err = db.Find(&resultList, "SELECT 1 AS id UNION SELECT 2")
+		if err == nil {
+			t.Errorf("\nerror not found")
+			return
+		}
+	})
+
+	t.Run("*struct", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var resultList test.Item
+		err = db.Find(&resultList, "SELECT 1 AS id UNION SELECT 2")
+		if err == nil {
+			t.Errorf("\nerror not found")
+			return
+		}
+	})
+
+	t.Run("*[]struct", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var resultList []test.Item
+		err = db.Find(&resultList, "SELECT 1 AS id UNION SELECT 2")
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+
+		checkList := []string{"1", "2"}
+		for key, val := range resultList {
+			target := fmt.Sprintf("%v", val.Id)
+			check := checkList[key]
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+	})
+
+	t.Run("*[]*struct", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var resultList []*test.Item
+		err = db.Find(&resultList, "SELECT 1 AS id UNION SELECT 2")
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+
+		checkList := []string{"1", "2"}
+		for key, val := range resultList {
+			target := fmt.Sprintf("%v", val.Id)
+			check := checkList[key]
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+	})
+
+	t.Run("*[]map[string]interface{}", func(t *testing.T) {
+		db, err := test.NewClientPostgresql()
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+		defer func() {
+			_ = db.Close()
+		}()
+
+		var resultList = make([]map[string]interface{}, 0)
+		err = db.Find(&resultList, "SELECT 1 AS id UNION SELECT 2")
+		if err != nil {
+			t.Errorf("\nerror: %v", err)
+			return
+		}
+
+		checkList := []string{"1", "2"}
+		for key, val := range resultList {
+			target := fmt.Sprintf("%v", val["id"])
+			check := checkList[key]
+			if target != check {
+				t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			}
+		}
+	})
+}
+
 func TestClient_FindRow(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		db, err := test.NewClientPostgresql()
@@ -98,7 +253,7 @@ func TestClient_FindRow(t *testing.T) {
 		}()
 
 		var result = &test.Item{}
-		err = db.FindRow(result, "select 1 as id")
+		err = db.FindRow(result, "SELECT 1 AS id")
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
 			return
@@ -124,7 +279,7 @@ func TestClient_ExtractRows(t *testing.T) {
 		}()
 
 		var resultList int
-		rows, err := db.Query("select 1 as id UNION SELECT 2 as id")
+		rows, err := db.Query("SELECT 1 AS id UNION SELECT 2")
 		err = db.ExtractRows(resultList, rows)
 		if err == nil {
 			t.Errorf("\nerror not found")
@@ -143,7 +298,7 @@ func TestClient_ExtractRows(t *testing.T) {
 		}()
 
 		var resultList int
-		rows, err := db.Query("select 1 as id UNION SELECT 2 as id")
+		rows, err := db.Query("SELECT 1 AS id UNION SELECT 2")
 		err = db.ExtractRows(&resultList, rows)
 		if err == nil {
 			t.Errorf("\nerror not found")
@@ -162,7 +317,7 @@ func TestClient_ExtractRows(t *testing.T) {
 		}()
 
 		var resultList test.Item
-		rows, err := db.Query("select 1 as id UNION SELECT 2 as id")
+		rows, err := db.Query("SELECT 1 AS id UNION SELECT 2")
 		err = db.ExtractRows(resultList, rows)
 		if err == nil {
 			t.Errorf("\nerror not found")
@@ -181,7 +336,7 @@ func TestClient_ExtractRows(t *testing.T) {
 		}()
 
 		var resultList test.Item
-		rows, err := db.Query("select 1 as id UNION SELECT 2 as id")
+		rows, err := db.Query("SELECT 1 AS id UNION SELECT 2")
 		err = db.ExtractRows(&resultList, rows)
 		if err == nil {
 			t.Errorf("\nerror not found")
@@ -200,7 +355,7 @@ func TestClient_ExtractRows(t *testing.T) {
 		}()
 
 		var resultList []test.Item
-		rows, err := db.Query("select 1 as id UNION SELECT 2 as id")
+		rows, err := db.Query("SELECT 1 AS id UNION SELECT 2")
 		err = db.ExtractRows(&resultList, rows)
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -228,7 +383,7 @@ func TestClient_ExtractRows(t *testing.T) {
 		}()
 
 		var resultList []*test.Item
-		rows, err := db.Query("select 1 as id UNION SELECT 2 as id")
+		rows, err := db.Query("SELECT 1 AS id UNION SELECT 2")
 		err = db.ExtractRows(&resultList, rows)
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -256,7 +411,7 @@ func TestClient_ExtractRows(t *testing.T) {
 		}()
 
 		var resultList = make([]map[string]interface{}, 0)
-		rows, err := db.Query("select 1 as id UNION SELECT 2 as id")
+		rows, err := db.Query("SELECT 1 AS id UNION SELECT 2")
 		err = db.ExtractRows(&resultList, rows)
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
@@ -286,7 +441,7 @@ func TestClient_ExtractRow(t *testing.T) {
 		}()
 
 		var result = &test.Item{}
-		rows, err := db.Query("select 1 as id")
+		rows, err := db.Query("SELECT 1 AS id")
 		err = db.ExtractRow(result, rows)
 		if err != nil {
 			t.Errorf("\nerror: %v", err)
