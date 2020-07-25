@@ -17,6 +17,7 @@ func TestRow_NewRow(t *testing.T) {
 		check := "row not found"
 		if target != check {
 			t.Errorf("\ntarget: %v\ncheck : %v", target, check)
+			return
 		}
 	})
 }
