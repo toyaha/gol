@@ -607,6 +607,24 @@ func (rec *Query) Select(dest interface{}) error {
 	return nil
 }
 
+func (rec *Query) SelectRow(dest interface{}) error {
+	if rec.Client == nil {
+		return errors.New("database does not exist")
+	}
+
+	query, valueList, err := rec.GetSelectQuery()
+	if err != nil {
+		return err
+	}
+
+	err = rec.Client.FindRow(dest, query, valueList...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (rec *Query) SelectCount(dest interface{}) error {
 	if rec.Client == nil {
 		return errors.New("database does not exist")
