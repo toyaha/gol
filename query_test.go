@@ -48,3 +48,26 @@ func TestQuery_SelectRow(t *testing.T) {
 	// 	})
 	// }
 }
+
+func TestQuery_SelectResultRow(t *testing.T) {
+	// tests := []struct {
+	// 	name    string
+	// 	rec     *Query
+	// 	want    *Row
+	// 	wantErr bool
+	// }{
+	// 	// TODO: Add test cases.
+	// }
+	// for _, tt := range tests {
+	// 	t.Run(tt.name, func(t *testing.T) {
+	// 		got, err := tt.rec.SelectResultRow()
+	// 		if (err != nil) != tt.wantErr {
+	// 			t.Errorf("Query.SelectResultRow() error = %v, wantErr %v", err, tt.wantErr)
+	// 			return
+	// 		}
+	// 		if !reflect.DeepEqual(got, tt.want) {
+	// 			t.Errorf("Query.SelectResultRow() = %v, want %v", got, tt.want)
+	// 		}
+	// 	})
+	// }
+}

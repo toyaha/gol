@@ -135,3 +135,50 @@ func TestClient_Query_SelectResultRows(t *testing.T) {
 		}
 	}
 }
+
+func TestClient_Query_SelectResultRow(t *testing.T) {
+	table := testItem{}
+	tests := []struct {
+		name     string
+		rec      *Query
+		setQuery func(*Query) *Query
+		want     *Row
+		wantErr  bool
+	}{
+		{
+			"default",
+			nil,
+			func(query *Query) *Query {
+				query.SetSelect(&table.Id)
+				return query
+			},
+			&Row{},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		for _, databaseType := range []string{DatabaseTypeMssql, DatabaseTypeMysql, DatabaseTypePostgresql} {
+			fmt.Printf("%+v\n", databaseType)
+			t.Run(tt.name+" for "+databaseType, func(t *testing.T) {
+				db, err := testNewClient(databaseType)
+				if err != nil {
+					t.Errorf("Query.SelectResultRow() error = %v, wantErr %v", err, tt.wantErr)
+					return
+				}
+				defer func() {
+					_ = db.Close()
+				}()
+
+				query := db.NewQuery(&table)
+				query = tt.setQuery(query)
+				rows, err := query.SelectResultRow()
+				if fmt.Sprintf("%T", rows) != fmt.Sprintf("%T", tt.want) {
+					t.Errorf("Query.SelectResultRow() error = %v, wantErr %v", err, tt.wantErr)
+				}
+				if (err != nil) != tt.wantErr {
+					t.Errorf("Query.SelectResultRow() error = %v, wantErr %v", err, tt.wantErr)
+				}
+			})
+		}
+	}
+}
