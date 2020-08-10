@@ -1,6 +1,30 @@
 package gol
 
-import "testing"
+import (
+	"testing"
+)
+
+func TestQuery_SelectResultRows(t *testing.T) {
+	// tests := []struct {
+	// 	name    string
+	// 	rec     *Query
+	// 	want    *sql.Rows
+	// 	wantErr bool
+	// }{
+	// }
+	// for _, tt := range tests {
+	// 	t.Run(tt.name, func(t *testing.T) {
+	// 		got, err := tt.rec.SelectResultRows()
+	// 		if (err != nil) != tt.wantErr {
+	// 			t.Errorf("Query.SelectResultRows() error = %v, wantErr %v", err, tt.wantErr)
+	// 			return
+	// 		}
+	// 		if !reflect.DeepEqual(got, tt.want) {
+	// 			t.Errorf("Query.SelectResultRows() = %v, want %v", got, tt.want)
+	// 		}
+	// 	})
+	// }
+}
 
 func TestQuery_SelectRow(t *testing.T) {
 	// type args struct {
@@ -13,10 +37,6 @@ func TestQuery_SelectRow(t *testing.T) {
 	// 	wantErr bool
 	// }{
 	// 	{
-	// 		"defalt",
-	// 		nil,
-	// 		args{[]interface{}{}},
-	// 		false,
 	// 	},
 	// }
 	// for _, tt := range tests {

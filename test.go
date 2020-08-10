@@ -1,6 +1,7 @@
 package gol
 
 import (
+	"errors"
 	"time"
 )
 
@@ -73,6 +74,18 @@ type testTag struct {
 	DeleteAt NullTime  `schema:"PUBLIC" table:"TAG" column:"DELETE_AT" json:"delete_at"`
 	Num      string    `schema:"PUBLIC" table:"TAG" column:"NUM" json:"NUM"`
 	Str      string    `schema:"PUBLIC" table:"TAG" column:"STR" json:"STR"`
+}
+
+func testNewClient(databaseType string) (*Client, error) {
+	switch databaseType {
+	case DatabaseTypeMssql:
+		return testNewClientMssql()
+	case DatabaseTypeMysql:
+		return testNewClientMysql()
+	case DatabaseTypePostgresql:
+		return testNewClientPostgresql()
+	}
+	return nil, errors.New("none database")
 }
 
 func testNewClientMssql() (*Client, error) {
