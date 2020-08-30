@@ -41,8 +41,6 @@ const (
 	QueryModeLte
 	QueryModeNest
 	QueryModeNestClose
-	QueryModeAsc
-	QueryModeDesc
 
 	QueryPrefixNone = ""
 	QueryPrefixAnd  = "AND"

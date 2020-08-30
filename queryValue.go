@@ -2208,16 +2208,6 @@ func (rec *QueryOrderBy) Build(meta *Meta) (string, error) {
 			query = strings.Join(strList, "")
 		}
 
-		switch rec.Mode {
-		case QueryModeDefault:
-		case QueryModeAsc:
-			query = fmt.Sprintf("%s ASC", query)
-		case QueryModeDesc:
-			query = fmt.Sprintf("%s DESC", query)
-		default:
-			return errors.New("orderBy mode not exist")
-		}
-
 		return nil
 	}()
 
@@ -2244,16 +2234,6 @@ func (rec *QueryOrderBy) BuildUseAs(meta *Meta) (string, error) {
 			}
 
 			query = strings.Join(strList, "")
-		}
-
-		switch rec.Mode {
-		case QueryModeDefault:
-		case QueryModeAsc:
-			query = fmt.Sprintf("%s ASC", query)
-		case QueryModeDesc:
-			query = fmt.Sprintf("%s DESC", query)
-		default:
-			return errors.New("orderBy mode not exist")
 		}
 
 		return nil

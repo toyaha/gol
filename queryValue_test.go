@@ -123,3 +123,145 @@ func TestQueryJoin_BuildUseAs(t *testing.T) {
 		})
 	}
 }
+
+func TestQueryOrderBy_Build(t *testing.T) {
+	table := testItem{}
+	var meta *Meta
+	{
+		query := NewQuery(nil)
+		query.SetJoin(&table)
+		meta = query.Value.Meta
+	}
+	type fields struct {
+		Mode      int
+		ValueList []interface{}
+	}
+	type args struct {
+		meta *Meta
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "default",
+			fields: fields{
+				Mode:      QueryModeDefault,
+				ValueList: []interface{}{&table.Id},
+			},
+			args:    args{meta: meta},
+			want:    `"item"."id"`,
+			wantErr: false,
+		},
+		{
+			name: "query",
+			fields: fields{
+				Mode:      QueryModeDefault,
+				ValueList: []interface{}{"count(", &table.Id, ") desc"},
+			},
+			args:    args{meta: meta},
+			want:    `count("item"."id") desc`,
+			wantErr: false,
+		},
+		{
+			name: "error not valueList",
+			fields: fields{
+				Mode:      QueryModeDefault,
+				ValueList: []interface{}{},
+			},
+			args:    args{meta: meta},
+			want:    ``,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rec := &QueryOrderBy{
+				Mode:      tt.fields.Mode,
+				ValueList: tt.fields.ValueList,
+			}
+			got, err := rec.Build(tt.args.meta)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("QueryOrderBy.Build() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("QueryOrderBy.Build() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestQueryOrderBy_BuildUseAs(t *testing.T) {
+	table := testItem{}
+	var meta *Meta
+	{
+		query := NewQuery(nil)
+		query.SetJoin(&table)
+		meta = query.Value.Meta
+	}
+	type fields struct {
+		Mode      int
+		ValueList []interface{}
+	}
+	type args struct {
+		meta *Meta
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "default",
+			fields: fields{
+				Mode:      QueryModeDefault,
+				ValueList: []interface{}{&table.Id},
+			},
+			args:    args{meta: meta},
+			want:    `"t0"."id"`,
+			wantErr: false,
+		},
+		{
+			name: "query",
+			fields: fields{
+				Mode:      QueryModeDefault,
+				ValueList: []interface{}{"count(", &table.Id, ") desc"},
+			},
+			args:    args{meta: meta},
+			want:    `count("t0"."id") desc`,
+			wantErr: false,
+		},
+		{
+			name: "error not valueList",
+			fields: fields{
+				Mode:      QueryModeDefault,
+				ValueList: []interface{}{},
+			},
+			args:    args{meta: meta},
+			want:    ``,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rec := &QueryOrderBy{
+				Mode:      tt.fields.Mode,
+				ValueList: tt.fields.ValueList,
+			}
+			got, err := rec.BuildUseAs(tt.args.meta)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("QueryOrderBy.BuildUseAs() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("QueryOrderBy.BuildUseAs() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

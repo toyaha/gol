@@ -213,3 +213,44 @@ func TestQuery_SetJoinRight(t *testing.T) {
 		})
 	}
 }
+
+func TestQuery_SetOrderBy(t *testing.T) {
+	table := testItem{}
+	type args struct {
+		valueList []interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "default",
+			args: args{
+				valueList: []interface{}{&table.Id},
+			},
+		},
+		{
+			name: "query",
+			args: args{
+				valueList: []interface{}{"count(", &table.Id, ") desc"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rec := &Query{
+				Client: &Client{},
+				Config: NewConfig(),
+				Value:  NewQueryValue(nil),
+			}
+			rec.SetOrderBy(tt.args.valueList...)
+			if len(rec.Value.OrderByList) != 1 {
+				t.Errorf("Query.SetOrderBy() length not 1")
+			} else {
+				if !reflect.DeepEqual(rec.Value.OrderByList[0].ValueList, tt.args.valueList) {
+					t.Errorf("Query.SetOrderBy() value=%+v , want%+v", rec.Value.OrderByList[0].ValueList, tt.args.valueList)
+				}
+			}
+		})
+	}
+}

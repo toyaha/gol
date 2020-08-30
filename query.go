@@ -1126,14 +1126,6 @@ func (rec *Query) SetOrderBy(valueList ...interface{}) {
 	rec.Value.AddOrderBy(QueryModeDefault, valueList...)
 }
 
-func (rec *Query) SetOrderByAsc(valueList ...interface{}) {
-	rec.Value.AddOrderBy(QueryModeAsc, valueList...)
-}
-
-func (rec *Query) SetOrderByDesc(valueList ...interface{}) {
-	rec.Value.AddOrderBy(QueryModeDesc, valueList...)
-}
-
 func (rec *Query) SetLimit(limit int) {
 	rec.Value.SetLimit(limit)
 }
