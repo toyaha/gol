@@ -1,6 +1,7 @@
 package gol
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -70,4 +71,145 @@ func TestQuery_SelectResultRow(t *testing.T) {
 	// 		}
 	// 	})
 	// }
+}
+
+func TestQuery_SetJoin(t *testing.T) {
+	table := testItem{}
+	type args struct {
+		tablePtr  interface{}
+		valueList []interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			"default",
+			args{
+				tablePtr:  &table,
+				valueList: []interface{}{},
+			},
+		},
+		{
+			"sub query",
+			args{
+				tablePtr:  &table,
+				valueList: []interface{}{"(select 1)"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rec := &Query{
+				Client: &Client{},
+				Config: NewConfig(),
+				Value:  NewQueryValue(nil),
+			}
+			rec.SetJoin(tt.args.tablePtr, tt.args.valueList...)
+			if len(rec.Value.JoinList) != 1 {
+				t.Errorf("Query.SetJoin() length not 1")
+			} else {
+				if rec.Value.JoinList[0].TablePtr != tt.args.tablePtr {
+					t.Errorf("Query.SetJoin() TablePtr not match")
+				}
+				if !reflect.DeepEqual(rec.Value.JoinList[0].ValueList, tt.args.valueList) {
+					t.Errorf("Query.SetJoin() value=%+v , want%+v", rec.Value.JoinList[0].ValueList, tt.args.valueList)
+				}
+			}
+		})
+	}
+}
+
+func TestQuery_SetJoinLeft(t *testing.T) {
+	table := testItem{}
+	type args struct {
+		tablePtr  interface{}
+		valueList []interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			"default",
+			args{
+				tablePtr:  &table,
+				valueList: []interface{}{},
+			},
+		},
+		{
+			"sub query",
+			args{
+				tablePtr:  &table,
+				valueList: []interface{}{"(select 1)"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rec := &Query{
+				Client: &Client{},
+				Config: NewConfig(),
+				Value:  NewQueryValue(nil),
+			}
+			rec.SetJoinLeft(tt.args.tablePtr, tt.args.valueList...)
+			if len(rec.Value.JoinList) != 1 {
+				t.Errorf("Query.SetJoinLeft() length not 1")
+			} else {
+				if rec.Value.JoinList[0].TablePtr != tt.args.tablePtr {
+					t.Errorf("Query.SetJoinLeft() TablePtr not match")
+				}
+				if !reflect.DeepEqual(rec.Value.JoinList[0].ValueList, tt.args.valueList) {
+					t.Errorf("Query.SetJoinLeft() value=%+v , want%+v", rec.Value.JoinList[0].ValueList, tt.args.valueList)
+				}
+			}
+		})
+	}
+}
+
+func TestQuery_SetJoinRight(t *testing.T) {
+	table := testItem{}
+	type args struct {
+		tablePtr  interface{}
+		valueList []interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			"default",
+			args{
+				tablePtr:  &table,
+				valueList: []interface{}{},
+			},
+		},
+		{
+			"sub query",
+			args{
+				tablePtr:  &table,
+				valueList: []interface{}{"(select 1)"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rec := &Query{
+				Client: &Client{},
+				Config: NewConfig(),
+				Value:  NewQueryValue(nil),
+			}
+			rec.SetJoinRight(tt.args.tablePtr, tt.args.valueList...)
+			if len(rec.Value.JoinList) != 1 {
+				t.Errorf("Query.SetJoinRight() length not 1")
+			} else {
+				if rec.Value.JoinList[0].TablePtr != tt.args.tablePtr {
+					t.Errorf("Query.SetJoinRight() TablePtr not match")
+				}
+				if !reflect.DeepEqual(rec.Value.JoinList[0].ValueList, tt.args.valueList) {
+					t.Errorf("Query.SetJoinRight() value=%+v , want%+v", rec.Value.JoinList[0].ValueList, tt.args.valueList)
+				}
+			}
+		})
+	}
 }

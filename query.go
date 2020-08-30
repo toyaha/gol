@@ -773,17 +773,17 @@ func (rec *Query) SetFrom(tablePtr interface{}, valueList ...interface{}) {
 
 func (rec *Query) SetJoin(tablePtr interface{}, valueList ...interface{}) {
 	rec.Value.AddMeta(tablePtr, true)
-	rec.Value.AddJoin(QueryJoinModeInner, tablePtr)
+	rec.Value.AddJoin(QueryJoinModeInner, tablePtr, valueList...)
 }
 
 func (rec *Query) SetJoinLeft(tablePtr interface{}, valueList ...interface{}) {
 	rec.Value.AddMeta(tablePtr, true)
-	rec.Value.AddJoin(QueryJoinModeLeft, tablePtr)
+	rec.Value.AddJoin(QueryJoinModeLeft, tablePtr, valueList...)
 }
 
 func (rec *Query) SetJoinRight(tablePtr interface{}, valueList ...interface{}) {
 	rec.Value.AddMeta(tablePtr, true)
-	rec.Value.AddJoin(QueryJoinModeRight, tablePtr)
+	rec.Value.AddJoin(QueryJoinModeRight, tablePtr, valueList...)
 }
 
 func (rec *Query) SetJoinWhere(tablePtr interface{}, valueList ...interface{}) {
