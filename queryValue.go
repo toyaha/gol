@@ -75,12 +75,10 @@ func (rec *QueryValue) GetInsertQuery() (string, []interface{}, error) {
 				return err
 			}
 
-			if str == "" {
-				return errors.New("values not exist")
+			if str != "" {
+				query = fmt.Sprintf("%v VALUES %v", query, str)
+				valueList = append(valueList, valList...)
 			}
-
-			query = fmt.Sprintf("%v VALUES %v", query, str)
-			valueList = append(valueList, valList...)
 		}
 
 		return nil
