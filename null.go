@@ -234,7 +234,7 @@ func (rec *NullInt32) UnmarshalJSON(value []byte) error {
 		return err
 	}
 
-	if val == nil {
+	if val != nil {
 		rec.Int32 = *val
 		rec.Valid = true
 	} else {
@@ -471,7 +471,7 @@ func (rec *NullTime) UnmarshalJSON(value []byte) error {
 		return err
 	}
 
-	if val == nil {
+	if val != nil {
 		rec.Time = *val
 		rec.Valid = true
 	} else {
