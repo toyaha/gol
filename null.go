@@ -45,6 +45,10 @@ func (rec *NullBool) GetStringWithDefault(value string) string {
 	return value
 }
 
+func (rec *NullBool) IsNull() bool {
+	return !rec.Valid
+}
+
 func (rec *NullBool) Set(value bool) {
 	rec.NullBool.Bool = value
 	rec.NullBool.Valid = true
@@ -118,6 +122,10 @@ func (rec *NullFloat64) GetStringWithDefault(value string) string {
 	}
 
 	return value
+}
+
+func (rec *NullFloat64) IsNull() bool {
+	return !rec.Valid
 }
 
 func (rec *NullFloat64) Set(value float64) {
@@ -195,6 +203,10 @@ func (rec *NullInt32) GetStringWithDefault(value string) string {
 	return value
 }
 
+func (rec *NullInt32) IsNull() bool {
+	return !rec.Valid
+}
+
 func (rec *NullInt32) Set(value int) {
 	rec.NullInt32.Int32 = int32(value)
 	rec.NullInt32.Valid = true
@@ -268,6 +280,10 @@ func (rec *NullInt64) GetStringWithDefault(value string) string {
 	}
 
 	return value
+}
+
+func (rec *NullInt64) IsNull() bool {
+	return !rec.Valid
 }
 
 func (rec *NullInt64) Set(value int) {
@@ -345,6 +361,10 @@ func (rec *NullString) GetStringWithDefault(value string) string {
 	return value
 }
 
+func (rec *NullString) IsNull() bool {
+	return !rec.Valid
+}
+
 func (rec *NullString) Set(value string) {
 	rec.NullString.String = value
 	rec.NullString.Valid = true
@@ -418,6 +438,10 @@ func (rec *NullTime) GetStringWithDefault(format string, value string) string {
 	}
 
 	return value
+}
+
+func (rec *NullTime) IsNull() bool {
+	return !rec.Valid
 }
 
 func (rec *NullTime) Set(value time.Time) {
