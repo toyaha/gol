@@ -19,6 +19,26 @@ func NewQuery(config *Config) *Query {
 	return query
 }
 
+func NewQueryDefault(tablePtrList ...interface{}) *Query {
+	config := NewConfig()
+
+	query := &Query{
+		Client: nil,
+		Config: config,
+		Value:  NewQueryValue(config),
+	}
+
+	if len(tablePtrList) > 0 {
+		for key := range tablePtrList {
+			query.AddMeta(tablePtrList[key])
+		}
+
+		query.SetTable(tablePtrList[0])
+	}
+
+	return query
+}
+
 type Query struct {
 	Client *Client
 	Config *Config
