@@ -309,34 +309,19 @@ func isValueNullStruct(val interface{}) bool {
 		return false
 	}
 
-	existFlag := true
-	switch val.(type) {
-	case NullBool:
-		existFlag = val.(NullBool).Valid
-	case *NullBool:
-		existFlag = val.(*NullBool).Valid
-	case NullFloat64:
-		existFlag = val.(NullFloat64).Valid
-	case *NullFloat64:
-		existFlag = val.(*NullFloat64).Valid
-	case NullInt32:
-		existFlag = val.(NullInt32).Valid
-	case *NullInt32:
-		existFlag = val.(*NullInt32).Valid
-	case NullInt64:
-		existFlag = val.(NullInt64).Valid
-	case *NullInt64:
-		existFlag = val.(*NullInt64).Valid
-	case NullString:
-		existFlag = val.(NullString).Valid
-	case *NullString:
-		existFlag = val.(*NullString).Valid
-	case NullTime:
-		existFlag = val.(NullTime).Valid
-	case *NullTime:
-		existFlag = val.(*NullTime).Valid
+	reflectValue := reflect.ValueOf(val)
+
+	if reflectValue.Kind() != reflect.Struct {
+		return true
 	}
-	return existFlag
+
+	fmt.Printf("%v\n", val)
+	reflectValid := reflectValue.FieldByName("Valid")
+	if reflectValid.IsValid() && reflectValid.Kind() == reflect.Bool {
+		return reflectValid.Bool()
+	}
+
+	return false
 }
 
 func makeTagIndexMap(value reflect.Type, tagName string) (map[string][]int, error) {

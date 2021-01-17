@@ -7,6 +7,12 @@ import (
 	"time"
 )
 
+type NullInterface interface {
+	IsNull() bool
+}
+
+var _ NullInterface = &NullBool{}
+
 type NullBool struct {
 	sql.NullBool
 }
@@ -85,6 +91,8 @@ func (rec *NullBool) UnmarshalJSON(value []byte) error {
 
 	return nil
 }
+
+var _ NullInterface = &NullFloat64{}
 
 type NullFloat64 struct {
 	sql.NullFloat64
@@ -165,6 +173,8 @@ func (rec *NullFloat64) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
+var _ NullInterface = &NullInt32{}
+
 type NullInt32 struct {
 	sql.NullInt32
 }
@@ -243,6 +253,8 @@ func (rec *NullInt32) UnmarshalJSON(value []byte) error {
 
 	return nil
 }
+
+var _ NullInterface = &NullInt64{}
 
 type NullInt64 struct {
 	sql.NullInt64
@@ -323,6 +335,8 @@ func (rec *NullInt64) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
+var _ NullInterface = &NullString{}
+
 type NullString struct {
 	sql.NullString
 }
@@ -401,6 +415,8 @@ func (rec *NullString) UnmarshalJSON(value []byte) error {
 
 	return nil
 }
+
+var _ NullInterface = &NullTime{}
 
 type NullTime struct {
 	sql.NullTime
