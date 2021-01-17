@@ -3,7 +3,7 @@ package gol
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -45,7 +45,7 @@ func (rec *NullBool) GetString() string {
 
 func (rec *NullBool) GetStringWithDefault(value string) string {
 	if rec.Valid {
-		return fmt.Sprintf("%v", rec.NullBool.Bool)
+		return strconv.FormatBool(rec.Bool)
 	}
 
 	return value
@@ -126,7 +126,7 @@ func (rec *NullFloat64) GetString() string {
 
 func (rec *NullFloat64) GetStringWithDefault(value string) string {
 	if rec.NullFloat64.Valid {
-		return fmt.Sprintf("%v", rec.NullFloat64.Float64)
+		return strconv.FormatFloat(rec.Float64, 'f', -1, 64)
 	}
 
 	return value
@@ -207,7 +207,7 @@ func (rec *NullInt32) GetString() string {
 
 func (rec *NullInt32) GetStringWithDefault(value string) string {
 	if rec.NullInt32.Valid {
-		return fmt.Sprintf("%v", rec.NullInt32.Int32)
+		return strconv.Itoa(int(rec.Int32))
 	}
 
 	return value
@@ -288,7 +288,7 @@ func (rec *NullInt64) GetString() string {
 
 func (rec *NullInt64) GetStringWithDefault(value string) string {
 	if rec.NullInt64.Valid {
-		return fmt.Sprintf("%v", rec.NullInt64.Int64)
+		return strconv.Itoa(int(rec.Int64))
 	}
 
 	return value
