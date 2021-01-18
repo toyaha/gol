@@ -187,14 +187,8 @@ func (rec *Client) GetTableAsColumn(any interface{}) string {
 }
 
 func (rec *Client) NewQuery(tablePtrList ...interface{}) *Query {
-	query := NewQuery(rec.Config)
+	query := NewQueryWithConfig(rec.Config, tablePtrList...)
 	query.SetClient(rec)
-	if len(tablePtrList) > 0 {
-		for _, val := range tablePtrList {
-			query.AddMeta(val)
-		}
-		query.SetTable(tablePtrList[0])
-	}
 	return query
 }
 

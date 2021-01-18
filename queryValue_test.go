@@ -9,7 +9,7 @@ func TestQueryJoin_BuildUseAs(t *testing.T) {
 	table := testItem{}
 	var meta *Meta
 	{
-		query := NewQuery(nil)
+		query := NewQuery()
 		query.SetJoin(&table)
 		meta = query.Value.Meta
 	}
@@ -128,7 +128,7 @@ func TestQueryOrderBy_Build(t *testing.T) {
 	table := testItem{}
 	var meta *Meta
 	{
-		query := NewQuery(nil)
+		query := NewQuery()
 		query.SetJoin(&table)
 		meta = query.Value.Meta
 	}
@@ -199,7 +199,7 @@ func TestQueryOrderBy_BuildUseAs(t *testing.T) {
 	table := testItem{}
 	var meta *Meta
 	{
-		query := NewQuery(nil)
+		query := NewQuery()
 		query.SetJoin(&table)
 		meta = query.Value.Meta
 	}

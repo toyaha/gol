@@ -5,22 +5,14 @@ import (
 	"errors"
 )
 
-func NewQuery(config *Config) *Query {
+func NewQuery(tablePtrList ...interface{}) *Query {
+	return NewQueryWithConfig(nil, tablePtrList...)
+}
+
+func NewQueryWithConfig(config *Config, tablePtrList ...interface{}) *Query {
 	if config == nil {
 		config = NewConfig()
 	}
-
-	query := &Query{
-		Client: nil,
-		Config: config,
-		Value:  NewQueryValue(config),
-	}
-
-	return query
-}
-
-func NewQueryDefault(tablePtrList ...interface{}) *Query {
-	config := NewConfig()
 
 	query := &Query{
 		Client: nil,

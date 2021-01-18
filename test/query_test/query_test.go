@@ -9,7 +9,7 @@ import (
 )
 
 func Query_setAllTypeA() *gol.Query {
-	query := gol.NewQuery(nil)
+	query := gol.NewQuery()
 
 	query.SetTable(&test.TableItem1)
 
@@ -153,7 +153,7 @@ func Query_setAllTypeA() *gol.Query {
 }
 
 func Query_setAllTypeB() *gol.Query {
-	query := gol.NewQuery(nil)
+	query := gol.NewQuery()
 
 	query.SetTable(&test.TableItem1)
 
@@ -359,7 +359,7 @@ func TestQuery_GetInsertQuery(t *testing.T) {
 	})
 
 	t.Run("error table not exist", func(t *testing.T) {
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		_, _, err := query.GetInsertQuery()
 		{
 			target := fmt.Sprintf("%v", err)
@@ -429,7 +429,7 @@ func TestQuery_GetInsertDoNothingQuery(t *testing.T) {
 	})
 
 	t.Run("error table not exist", func(t *testing.T) {
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		_, _, err := query.GetInsertQuery()
 		{
 			target := fmt.Sprintf("%v", err)
@@ -500,7 +500,7 @@ func TestQuery_GetInsertDoUpdateQuery(t *testing.T) {
 	})
 
 	t.Run("error table not exist", func(t *testing.T) {
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		_, _, err := query.GetInsertQuery()
 		{
 			target := fmt.Sprintf("%v", err)
@@ -570,7 +570,7 @@ func TestQuery_GetInsertIgnoreQuery(t *testing.T) {
 	})
 
 	t.Run("error table not exist", func(t *testing.T) {
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		_, _, err := query.GetInsertQuery()
 		{
 			target := fmt.Sprintf("%v", err)
@@ -641,7 +641,7 @@ func TestQuery_GetInsertOnDuplicateKeyUpdateQuery(t *testing.T) {
 	})
 
 	t.Run("error table not exist", func(t *testing.T) {
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		_, _, err := query.GetInsertQuery()
 		{
 			target := fmt.Sprintf("%v", err)
@@ -714,7 +714,7 @@ func TestQuery_GetInsertSelectQuery(t *testing.T) {
 	})
 
 	t.Run("error table not exist", func(t *testing.T) {
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		_, _, err := query.GetInsertQuery()
 		{
 			target := fmt.Sprintf("%v", err)
@@ -784,7 +784,7 @@ func TestQuery_GetInsertSelectUnionQuery(t *testing.T) {
 	})
 
 	t.Run("error table not exist", func(t *testing.T) {
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		_, _, err := query.GetInsertQuery()
 		{
 			target := fmt.Sprintf("%v", err)
@@ -827,7 +827,7 @@ func TestQuery_GetUpdateQuery(t *testing.T) {
 	})
 
 	t.Run("error table not exist", func(t *testing.T) {
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		_, _, err := query.GetUpdateQuery()
 		{
 			target := fmt.Sprintf("%v", err)
@@ -841,7 +841,7 @@ func TestQuery_GetUpdateQuery(t *testing.T) {
 
 	t.Run("error set not exist", func(t *testing.T) {
 		table := test.Item{}
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		query.SetTable(&table)
 		_, _, err := query.GetUpdateQuery()
 		{
@@ -884,7 +884,7 @@ func TestQuery_GetDeleteQuery(t *testing.T) {
 	})
 
 	t.Run("error table not exist", func(t *testing.T) {
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		_, _, err := query.GetDeleteQuery()
 		{
 			target := fmt.Sprintf("%v", err)
@@ -953,7 +953,7 @@ func TestQuery_GetTruncateRestartIdentityQuery(t *testing.T) {
 	})
 
 	t.Run("error table not exist", func(t *testing.T) {
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		_, _, err := query.GetTruncateRestartIdentityQuery()
 		{
 			target := fmt.Sprintf("%v", err)
@@ -1027,7 +1027,7 @@ func TestQuery_GetSelectQuery(t *testing.T) {
 
 	t.Run("error select not exist", func(t *testing.T) {
 		table := test.Item{}
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		query.SetTable(&table)
 		_, _, err := query.GetSelectQuery()
 		{
@@ -1041,7 +1041,7 @@ func TestQuery_GetSelectQuery(t *testing.T) {
 	})
 
 	t.Run("error table not exist", func(t *testing.T) {
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		_, _, err := query.GetSelectQuery()
 		{
 			target := fmt.Sprintf("%v", err)
@@ -1115,7 +1115,7 @@ func TestQuery_GetSelectCountQuery(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		table := test.Item{}
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		query.SetTable(&table)
 		query.SetSelectAll(&table)
 		str, valueList, err := query.GetSelectQuery()
@@ -1142,7 +1142,7 @@ func TestQuery_GetSelectCountQuery(t *testing.T) {
 	})
 
 	t.Run("error table not exist", func(t *testing.T) {
-		query := gol.NewQuery(nil)
+		query := gol.NewQuery()
 		_, _, err := query.GetSelectCountQuery()
 		{
 			target := fmt.Sprintf("%v", err)
