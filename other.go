@@ -315,7 +315,6 @@ func isValueNullStruct(val interface{}) bool {
 		return true
 	}
 
-	fmt.Printf("%v\n", val)
 	reflectValid := reflectValue.FieldByName("Valid")
 	if reflectValid.IsValid() && reflectValid.Kind() == reflect.Bool {
 		return reflectValid.Bool()
